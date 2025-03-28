@@ -22,7 +22,7 @@ fun RegistrationScreen(
             0f to PrimaryViolet,
             1f to PrimaryVioletDark
         ),
-        imgRes = R.drawable.img_coder_w,
+        imgRes = R.drawable.img2,
         title = "Hi there!",
         subtitle = "Let's Get Started",
         mainActionButtonTitle = "Create an Account",

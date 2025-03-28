@@ -23,7 +23,7 @@ fun LoginScreen(
             0f to PrimaryPinkBlended,
             1f to PrimaryPink
         ),
-        imgRes = R.drawable.img_coder_m,
+        imgRes = R.drawable.img1,
         title = "Welcome back!",
         subtitle = "Please, Log In.",
         mainActionButtonTitle = "Continue",
