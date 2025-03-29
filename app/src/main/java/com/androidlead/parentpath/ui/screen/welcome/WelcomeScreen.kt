@@ -1,4 +1,4 @@
-package com.androidlead.loginappui.ui.screen.welcome
+package com.androidlead.parentpath.ui.screen.welcome
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,14 +20,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.androidlead.loginappui.R
-import com.androidlead.loginappui.ui.components.ActionButton
-import com.androidlead.loginappui.ui.theme.DarkTextColor
-import com.androidlead.loginappui.ui.theme.PrimaryPinkBlended
-import com.androidlead.loginappui.ui.theme.PrimaryYellow
-import com.androidlead.loginappui.ui.theme.PrimaryYellowDark
-import com.androidlead.loginappui.ui.theme.PrimaryYellowLight
+import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.components.ActionButton
+import com.androidlead.parentpath.ui.theme.DarkTextColor
+import com.androidlead.parentpath.ui.theme.PrimaryPinkBlended
+import com.androidlead.parentpath.ui.theme.PrimaryYellow
+import com.androidlead.parentpath.ui.theme.PrimaryYellowDark
+import com.androidlead.parentpath.ui.theme.PrimaryYellowLight
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun WelcomeScreen(
@@ -47,6 +48,9 @@ fun WelcomeScreen(
             .systemBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
         Image(
             painter = painterResource(R.drawable.img_welcome),
             contentDescription = null,
@@ -58,7 +62,16 @@ fun WelcomeScreen(
             modifier = Modifier.height(24.dp)
         )
         Text(
-            text = "Welcome to ParentPath",
+            text = "Welcome to",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
+            color = DarkTextColor,
+            fontSize = 22.sp
+        )
+        Text(
+            text = "ParentPath",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Black,
             modifier = Modifier.padding(horizontal = 24.dp),
@@ -66,17 +79,17 @@ fun WelcomeScreen(
             color = DarkTextColor
         )
         Spacer(
-            modifier = Modifier.height(16.dp)
+            modifier = Modifier.height(20.dp)
         )
         Text(
-            text = "All support you need just one tap away!",
+            text = "No more stress \n discover trusted help nearby",
             modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = DarkTextColor
         )
         Spacer(
-            modifier = Modifier.weight(weight = 1f)
+            modifier = Modifier.height(70.dp)
         )
         ActionButton(
             text = "Get Started",

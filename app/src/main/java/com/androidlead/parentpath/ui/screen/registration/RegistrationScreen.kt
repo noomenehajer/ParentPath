@@ -1,14 +1,14 @@
-package com.androidlead.loginappui.ui.screen.registration
+package com.androidlead.parentpath.ui.screen.registration
 
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.androidlead.loginappui.R
-import com.androidlead.loginappui.ui.components.AuthenticationScreenTemplate
-import com.androidlead.loginappui.ui.theme.PrimaryViolet
-import com.androidlead.loginappui.ui.theme.PrimaryVioletDark
-import com.androidlead.loginappui.ui.theme.PrimaryVioletLight
+import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.components.AuthenticationScreenTemplate
+import com.androidlead.parentpath.ui.theme.PrimaryViolet
+import com.androidlead.parentpath.ui.theme.PrimaryVioletDark
+import com.androidlead.parentpath.ui.theme.PrimaryVioletLight
 
 @Composable
 fun RegistrationScreen(

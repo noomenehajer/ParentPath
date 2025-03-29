@@ -1,13 +1,13 @@
-package com.androidlead.loginappui.ui.screen.container
+package com.androidlead.parentpath.ui.screen.container
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.androidlead.loginappui.ui.screen.home.HomeScreen
-import com.androidlead.loginappui.ui.screen.login.LoginScreen
-import com.androidlead.loginappui.ui.screen.registration.RegistrationScreen
-import com.androidlead.loginappui.ui.screen.welcome.WelcomeScreen
+import com.androidlead.parentpath.ui.screen.home.HomeScreen
+import com.androidlead.parentpath.ui.screen.login.LoginScreen
+import com.androidlead.parentpath.ui.screen.registration.RegistrationScreen
+import com.androidlead.parentpath.ui.screen.welcome.WelcomeScreen
 
 @Composable
 fun ScreenContainer() {

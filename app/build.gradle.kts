@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.androidlead.loginappui"
+    namespace = "com.androidlead.parentpath"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.androidlead.loginappui"
+        applicationId = "com.androidlead.parentpath"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

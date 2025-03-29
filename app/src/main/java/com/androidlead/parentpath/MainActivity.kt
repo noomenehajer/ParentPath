@@ -1,11 +1,11 @@
-package com.androidlead.loginappui
+package com.androidlead.parentpath
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.androidlead.loginappui.ui.screen.container.ScreenContainer
-import com.androidlead.loginappui.ui.theme.LoginAppUiTheme
+import com.androidlead.parentpath.ui.screen.container.ScreenContainer
+import com.androidlead.parentpath.ui.theme.LoginAppUiTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

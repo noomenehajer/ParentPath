@@ -1,4 +1,4 @@
-package com.androidlead.loginappui.ui.screen.container
+package com.androidlead.parentpath.ui.screen.container
 
 sealed class NavGraph(val route: String) {
     data object Welcome: NavGraph(route = "welcome_screen")

@@ -1,4 +1,4 @@
-package com.androidlead.loginappui.ui.components
+package com.androidlead.parentpath.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
@@ -48,8 +48,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.androidlead.loginappui.R
-import com.androidlead.loginappui.ui.theme.DarkTextColor
+import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.theme.DarkTextColor
 import kotlinx.coroutines.launch
 
 @Composable

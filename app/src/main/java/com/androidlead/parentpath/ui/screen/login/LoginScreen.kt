@@ -1,15 +1,15 @@
-package com.androidlead.loginappui.ui.screen.login
+package com.androidlead.parentpath.ui.screen.login
 
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.androidlead.loginappui.R
-import com.androidlead.loginappui.ui.components.AuthenticationScreenTemplate
-import com.androidlead.loginappui.ui.theme.PrimaryPink
-import com.androidlead.loginappui.ui.theme.PrimaryPinkBlended
-import com.androidlead.loginappui.ui.theme.PrimaryPinkDark
-import com.androidlead.loginappui.ui.theme.PrimaryPinkLight
+import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.components.AuthenticationScreenTemplate
+import com.androidlead.parentpath.ui.theme.PrimaryPink
+import com.androidlead.parentpath.ui.theme.PrimaryPinkBlended
+import com.androidlead.parentpath.ui.theme.PrimaryPinkDark
+import com.androidlead.parentpath.ui.theme.PrimaryPinkLight
 
 @Composable
 fun LoginScreen(

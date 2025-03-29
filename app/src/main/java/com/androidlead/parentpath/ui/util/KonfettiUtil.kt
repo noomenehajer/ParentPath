@@ -1,4 +1,4 @@
-package com.androidlead.loginappui.ui.util
+package com.androidlead.parentpath.ui.util
 
 import nl.dionsegijn.konfetti.core.Angle
 import nl.dionsegijn.konfetti.core.Party

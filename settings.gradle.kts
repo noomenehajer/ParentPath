@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LoginAppUi"
+rootProject.name = "parentpath"
 include(":app")

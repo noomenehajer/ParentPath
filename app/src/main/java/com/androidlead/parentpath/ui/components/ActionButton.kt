@@ -1,4 +1,4 @@
-package com.androidlead.loginappui.ui.components
+package com.androidlead.parentpath.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -21,9 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.androidlead.loginappui.R
-import com.androidlead.loginappui.ui.theme.LoginAppUiTheme
-import com.androidlead.loginappui.ui.theme.PrimaryPink
+import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.theme.LoginAppUiTheme
+import com.androidlead.parentpath.ui.theme.PrimaryPink
 
 @Composable
 fun ActionButton(
