@@ -148,7 +148,7 @@ fun AuthenticationScreenTemplate(
 private fun Message(
     modifier: Modifier = Modifier,
     title: String,
-    subtitle: String
+    subtitle: String,
 ) {
     Column(
         modifier = modifier,
@@ -159,7 +159,7 @@ private fun Message(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White,
+            color = DarkTextColor,
             fontWeight = FontWeight.Medium
         )
         Text(
@@ -167,7 +167,7 @@ private fun Message(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
+            color = DarkTextColor,
             fontWeight = FontWeight.Black
         )
     }
@@ -236,7 +236,7 @@ private fun Separator(
         Text(
             text = "Or",
             style = MaterialTheme.typography.labelMedium,
-            color = Color.White
+            color = Color.DarkGray
         )
         DashedLine(
             modifier = Modifier.weight(weight = 1f)
@@ -250,7 +250,7 @@ private fun DashedLine(
 ) {
     Canvas(modifier = modifier) {
         drawLine(
-            color = Color.White,
+            color = Color.DarkGray,
             start = Offset(0f, 0f),
             end = Offset(size.width, 0f),
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f),

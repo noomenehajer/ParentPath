@@ -1,16 +1,16 @@
 package com.androidlead.parentpath.ui.screen.login
-
+import com.androidlead.parentpath.ui.theme.DarkTextColor
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.components.AuthenticationScreenTemplate
-import com.androidlead.parentpath.ui.theme.PrimaryPink
 import com.androidlead.parentpath.ui.theme.PrimaryPinkBlended
-import com.androidlead.parentpath.ui.theme.PrimaryPinkDark
-import com.androidlead.parentpath.ui.theme.PrimaryPinkLight
-
+import com.androidlead.parentpath.ui.theme.PrimaryYellow
+import com.androidlead.parentpath.ui.theme.PrimaryYellowLight
+import com.androidlead.parentpath.ui.theme.PrimaryYellowDark
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
@@ -20,26 +20,25 @@ fun LoginScreen(
     AuthenticationScreenTemplate(
         modifier = modifier,
         backgroundGradient = arrayOf(
-            0f to PrimaryPinkBlended,
-            1f to PrimaryPink
+            0f to PrimaryYellow,
+            0.6f to PrimaryYellowLight,
+            1f to PrimaryPinkBlended
         ),
         imgRes = R.drawable.img1,
         title = "Welcome back!",
-        subtitle = "Please, Log In.",
+        subtitle = "Please sign in",
         mainActionButtonTitle = "Continue",
-        secondaryActionButtonTitle = "Create an Account",
+        secondaryActionButtonTitle = "Create an account",
         mainActionButtonColors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryPinkDark,
-            contentColor = Color.White
+            containerColor = PrimaryYellowDark,
+            contentColor = Color.DarkGray
         ),
         secondaryActionButtonColors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryPinkLight,
+            containerColor = Color(0xFFAA4B59),
             contentColor = Color.White
         ),
-        actionButtonShadow = PrimaryPinkDark,
+        actionButtonShadow = PrimaryYellowDark,
         onMainActionButtonClicked = onLoginClicked,
         onSecondaryActionButtonClicked = onRegistrationClicked
     )
 }
-
-

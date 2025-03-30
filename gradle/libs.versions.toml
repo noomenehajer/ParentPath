@@ -4,9 +4,11 @@ kotlin = "1.9.0"
 androidx-core = "1.13.1"
 androidx-runtime = "2.8.4"
 compose-activity = "1.9.1"
-compose-bom = "2024.06.00"
+compose-bom = "2023.10.01"
 compose-navigation = "2.7.7"
 konfetti = "2.0.4"
+google-gms-google-services = "4.4.2"
+firebase-auth = "23.2.0"
 
 [libraries]
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core" }
@@ -22,6 +24,7 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "compose-navigation" }
 
 konfetti = { group = "nl.dionsegijn", name = "konfetti-compose", version.ref = "konfetti" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebase-auth" }
 
 [bundles]
 androidX = ["androidx-core", "androidx-lifecycle"]
@@ -30,3 +33,4 @@ ui = ["compose-ui", "compose-graphics", "compose-tooling-preview", "compose-acti
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "google-gms-google-services" }

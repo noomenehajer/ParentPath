@@ -6,9 +6,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.components.AuthenticationScreenTemplate
+import com.androidlead.parentpath.ui.theme.DarkTextColor
+import com.androidlead.parentpath.ui.theme.PrimaryPinkBlended
 import com.androidlead.parentpath.ui.theme.PrimaryViolet
 import com.androidlead.parentpath.ui.theme.PrimaryVioletDark
 import com.androidlead.parentpath.ui.theme.PrimaryVioletLight
+import com.androidlead.parentpath.ui.theme.PrimaryYellow
+import com.androidlead.parentpath.ui.theme.PrimaryYellowDark
+import com.androidlead.parentpath.ui.theme.PrimaryYellowLight
 
 @Composable
 fun RegistrationScreen(
@@ -19,23 +24,24 @@ fun RegistrationScreen(
     AuthenticationScreenTemplate(
         modifier = modifier,
         backgroundGradient = arrayOf(
-            0f to PrimaryViolet,
-            1f to PrimaryVioletDark
+            0f to PrimaryYellow,
+            0.6f to PrimaryYellowLight,
+            1f to PrimaryPinkBlended
         ),
         imgRes = R.drawable.img2,
         title = "Hi there!",
         subtitle = "Let's Get Started",
-        mainActionButtonTitle = "Create an Account",
+        mainActionButtonTitle = "Sign up",
         secondaryActionButtonTitle = "Log In",
         mainActionButtonColors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryVioletDark,
-            contentColor = Color.White
+            containerColor = PrimaryYellowDark,
+            contentColor = Color.DarkGray
         ),
         secondaryActionButtonColors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryVioletLight,
+            containerColor = Color(0xFFAA4B59),
             contentColor = Color.White
         ),
-        actionButtonShadow = PrimaryVioletDark,
+        actionButtonShadow = PrimaryYellowDark,
         onMainActionButtonClicked = onRegisterClicked,
         onSecondaryActionButtonClicked = onLoginClicked
     )
