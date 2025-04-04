@@ -3,6 +3,7 @@ package com.androidlead.parentpath.ui.screen.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -157,27 +158,61 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search...") },
+                placeholder = { Text("Search...", color = Color.DarkGray) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = Color.Gray
+                        tint = Color.DarkGray
                     )
                 },
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryPink,
-                    unfocusedBorderColor = Color.LightGray
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedBorderColor = Color.Gray,
+                    unfocusedBorderColor = Color.LightGray,
+                    cursorColor = Color.Black,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Search
                 ),
                 keyboardActions = KeyboardActions(
-                    onSearch = { /* Handle search action */ }
+                    onSearch = { /* Handle search */ }
                 )
             )
+
+// Categories Section
+            val categories = listOf("Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
+
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(categories.size) { index ->
+                    ElevatedAssistChip(
+                        onClick = { /* Handle click */ },
+                        label = {
+                            Text(
+                                text = categories[index],
+                                color = Color.DarkGray,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = AssistChipDefaults.elevatedAssistChipColors(
+                            containerColor = Color.White
+                        )
+                    )
+                }
+            }
+
 
             // Main Content
             Box(
@@ -185,7 +220,7 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Welcome to ParentPath",
+                    text = "content..",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
