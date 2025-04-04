@@ -135,9 +135,9 @@ fun HomeScreen(
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                     Text(
-                        text = "ParentPath",
+                        text = "parentpath",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                       // fontWeight = FontWeight.Bold,
                         color = Color.DarkGray
                     )
                 }
@@ -220,7 +220,7 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "content..",
+                    text = "loading.. 👀",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
