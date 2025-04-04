@@ -59,7 +59,7 @@ fun HomeScreen(
                 ) {
                     // Profile Picture
                     Image(
-                        painter = painterResource(R.drawable.img_welcome),
+                        painter = painterResource(R.drawable.avatar),
                         contentDescription = "Profile Picture",
                         modifier = Modifier
                             .size(80.dp)
@@ -69,7 +69,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     // User Name
                     Text(
-                        text = "John Doe",
+                        text = "default name",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
