@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
 }
+
 
 android {
     namespace = "com.androidlead.parentpath"
@@ -49,10 +51,16 @@ android {
 }
 
 dependencies {
-    //AndroidX
+    // AndroidX
     implementation(libs.bundles.androidX)
-    //Compose
+
+    // Compose
     implementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.tooling)
     implementation(libs.bundles.ui)
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 }

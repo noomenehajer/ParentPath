@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.androidlead.parentpath.ui.components.ActionButton
 import com.androidlead.parentpath.ui.theme.PrimaryGreen
 import com.androidlead.parentpath.ui.theme.PrimaryGreenDark
+import com.androidlead.parentpath.ui.theme.PrimaryPinkBlended
 import com.androidlead.parentpath.ui.theme.PrimaryPinkDark
 import com.androidlead.parentpath.ui.theme.PrimaryViolet
-import com.androidlead.parentpath.ui.util.KonfettiUtil
+import com.androidlead.parentpath.ui.theme.PrimaryYellow
+import com.androidlead.parentpath.ui.theme.PrimaryYellowLight
 import nl.dionsegijn.konfetti.compose.KonfettiView
 
 @Composable
@@ -36,8 +38,9 @@ fun HomeScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0f to PrimaryViolet,
-                    1f to PrimaryGreen
+                    0f to PrimaryPinkBlended,
+                    0.6f to PrimaryYellowLight,
+                    1f to PrimaryYellow
                 )
             )
             .systemBarsPadding(),
@@ -55,17 +58,14 @@ fun HomeScreen(
             isNavigationArrowVisible = false,
             onClicked = onRestartFlowClicked,
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryGreenDark,
-                contentColor = Color.White
+                containerColor = Color(0xFFAA4B59),
+                contentColor = Color(0xFFFFF5CC)
             ),
             shadowColor = PrimaryPinkDark,
             modifier = Modifier.padding(24.dp)
         )
     }
-    KonfettiView(
-        modifier = Modifier.fillMaxSize(),
-        parties = KonfettiUtil.parade()
-    )
+
 }
 
 @Composable
@@ -78,15 +78,11 @@ private fun Greetings(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Congratulations!",
+            text = "Hello",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.DarkGray
         )
-        Text(
-            text = "\uD83E\uDD73",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.Black
-        )
+
     }
 }
