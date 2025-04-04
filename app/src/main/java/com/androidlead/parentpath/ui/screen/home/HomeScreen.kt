@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.theme.*
+import kotlinx.coroutines.launch
 
 data class MenuItem(
     val title: String,
@@ -33,7 +34,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onRestartFlowClicked: () -> Unit
 ) {
-    var drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     
     val menuItems = listOf(
@@ -43,11 +44,11 @@ fun HomeScreen(
         MenuItem("Booking List", Icons.Default.List) { /* Handle bookings */ }
     )
 
-    PermanentNavigationDrawer(
+    ModalNavigationDrawer(
+        drawerState = drawerState,
         drawerContent = {
-            PermanentDrawerSheet(
-                modifier = Modifier.width(240.dp),
-                drawerContainerColor = MaterialTheme.colorScheme.background
+            ModalDrawerSheet(
+                modifier = Modifier.width(240.dp)
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 // Profile Section
@@ -85,7 +86,10 @@ fun HomeScreen(
                         icon = { Icon(item.icon, contentDescription = null) },
                         label = { Text(item.title) },
                         selected = false,
-                        onClick = item.onClick,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            item.onClick()
+                        },
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -98,7 +102,10 @@ fun HomeScreen(
                     icon = { Icon(Icons.Default.ExitToApp, contentDescription = null) },
                     label = { Text("Logout") },
                     selected = false,
-                    onClick = onRestartFlowClicked,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onRestartFlowClicked()
+                    },
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
@@ -115,17 +122,33 @@ fun HomeScreen(
                         1f to PrimaryYellow
                     )
                 )
-                .systemBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .systemBarsPadding()
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "Welcome to ParentPath",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.DarkGray
+            // Top App Bar with menu button
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Open Menu")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                )
             )
-            Spacer(modifier = Modifier.weight(1f))
+            
+            // Content
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Welcome to ParentPath",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.DarkGray
+                )
+            }
         }
     }
 }
