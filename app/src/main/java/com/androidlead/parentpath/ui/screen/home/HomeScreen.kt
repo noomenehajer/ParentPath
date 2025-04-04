@@ -4,6 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,12 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.theme.*
@@ -36,7 +41,8 @@ fun HomeScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    
+    var searchQuery by remember { mutableStateOf("") }
+
     val menuItems = listOf(
         MenuItem("Edit Profile", Icons.Default.Person) { /* Handle profile edit */ },
         MenuItem("Home", Icons.Default.Home) { /* Handle home navigation */ },
@@ -47,18 +53,14 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.width(240.dp)
-            ) {
+            ModalDrawerSheet(modifier = Modifier.width(240.dp)) {
                 Spacer(modifier = Modifier.height(24.dp))
-                // Profile Section
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Profile Picture
                     Image(
                         painter = painterResource(R.drawable.avatar),
                         contentDescription = "Profile Picture",
@@ -68,7 +70,6 @@ fun HomeScreen(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    // User Name
                     Text(
                         text = "default name",
                         style = MaterialTheme.typography.titleMedium,
@@ -80,7 +81,6 @@ fun HomeScreen(
                 Divider()
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Menu Items
                 menuItems.forEach { item ->
                     NavigationDrawerItem(
                         icon = { Icon(item.icon, contentDescription = null) },
@@ -95,7 +95,6 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 
-                // Logout at the bottom
                 Spacer(modifier = Modifier.weight(1f))
                 Divider()
                 NavigationDrawerItem(
@@ -111,7 +110,6 @@ fun HomeScreen(
             }
         }
     ) {
-        // Main content
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -124,20 +122,72 @@ fun HomeScreen(
                 )
                 .systemBarsPadding()
         ) {
-            // Top App Bar with menu button
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Open Menu")
+            // TopBar with menu, title, notification
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(4.dp),
+                color = Color.White
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                        Text(
+                            text = "ParentPath",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
                     }
+
+                    IconButton(onClick = { /* Handle notifications */ }) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            tint = Color.DarkGray
+                        )
+                    }
+                }
+            }
+
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholder = { Text("Search...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray
+                    )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryPink,
+                    unfocusedBorderColor = Color.LightGray
+                ),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = { /* Handle search action */ }
                 )
             )
-            
-            // Content
+
+            // Main Content
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
