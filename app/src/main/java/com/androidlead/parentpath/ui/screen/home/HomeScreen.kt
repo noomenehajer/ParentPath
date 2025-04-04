@@ -32,7 +32,6 @@ data class MenuItem(
     val icon: ImageVector,
     val onClick: () -> Unit
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -122,39 +121,32 @@ fun HomeScreen(
                 )
                 .systemBarsPadding()
         ) {
-            // TopBar with menu, title, notification
-            Surface(
+            // Transparent header bar with app name and bell
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(4.dp),
-                color = Color.White
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                        Text(
-                            text = "ParentPath",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
+                    Text(
+                        text = "ParentPath",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.DarkGray
+                    )
+                }
 
-                    IconButton(onClick = { /* Handle notifications */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = Color.DarkGray
-                        )
-                    }
+                IconButton(onClick = { /* Handle notifications */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notifications",
+                        tint = Color.DarkGray
+                    )
                 }
             }
 
