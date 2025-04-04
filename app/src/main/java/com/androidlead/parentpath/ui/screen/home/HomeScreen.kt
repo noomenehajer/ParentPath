@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.theme.*
@@ -130,18 +131,25 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
+                // Menu button on the left
+                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    Icon(Icons.Default.Menu, contentDescription = "Menu")
+                }
+
+                // Centered text
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "parentpath",
-                        style = MaterialTheme.typography.titleLarge,
-                       // fontWeight = FontWeight.Bold,
-                        color = Color.DarkGray
+                        text = "♡ Here For You ♡",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Color.DarkGray,
+                        textAlign = TextAlign.Center
                     )
                 }
 
+                // Notification icon on the right
                 IconButton(onClick = { /* Handle notifications */ }) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
@@ -150,7 +158,6 @@ fun HomeScreen(
                     )
                 }
             }
-
             // Search Bar
             OutlinedTextField(
                 value = searchQuery,
