@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.androidlead.parentpath.ui.screen.home.HomeScreen
 import com.androidlead.parentpath.ui.screen.login.LoginScreen
+import com.androidlead.parentpath.ui.screen.profile.ProfileScreen
 import com.androidlead.parentpath.ui.screen.registration.RegistrationScreen
 import com.androidlead.parentpath.ui.screen.welcome.WelcomeScreen
 
@@ -41,6 +42,13 @@ fun ScreenContainer() {
                 },
                 onLoginClicked = {
                     navHost.navigate(NavGraph.Login.route)
+                }
+            )
+        }
+        composable(NavGraph.Profile.route) {
+            ProfileScreen(
+                onRestartFlowClicked = {
+                    navHost.navigate(NavGraph.Profile.route)
                 }
             )
         }

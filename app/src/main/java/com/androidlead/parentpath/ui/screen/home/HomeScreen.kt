@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
+import androidx.navigation.compose.rememberNavController
+import com.androidlead.parentpath.ui.screen.container.NavGraph
 
 data class MenuItem(
     val title: String,
@@ -43,9 +45,10 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
+    val navHost = rememberNavController()
 
     val menuItems = listOf(
-        MenuItem("Edit Profile", Icons.Default.Person) { /* Handle profile edit */ },
+        MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
         MenuItem("Home", Icons.Default.Home) { /* Handle home navigation */ },
         MenuItem("Offer a Service", Icons.Default.Add) { /* Handle service offering */ },
         MenuItem("Booking List", Icons.Default.List) { /* Handle bookings */ }
