@@ -49,7 +49,8 @@ fun ScreenContainer() {
             ProfileScreen(
                 onRestartFlowClicked = {
                     navHost.navigate(NavGraph.Profile.route)
-                }
+                },
+                navHost = navHost
             )
         }
         composable(NavGraph.Home.route) {
