@@ -56,7 +56,8 @@ fun ScreenContainer() {
             HomeScreen(
                 onRestartFlowClicked = {
                     navHost.navigate(NavGraph.Welcome.route)
-                }
+                },
+                navHost = navHost
             )
         }
     }
