@@ -37,9 +37,9 @@ fun RegistrationScreen(
     AuthenticationScreenTemplate(
         modifier = modifier,
         backgroundGradient = arrayOf(
-            0f to PrimaryYellow,
+            0f to PrimaryPinkBlended,
             0.6f to PrimaryYellowLight,
-            1f to PrimaryPinkBlended
+            1f to PrimaryYellow
         ),
         imgRes = R.drawable.img2,
         title = "Hi there!",
