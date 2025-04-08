@@ -84,8 +84,8 @@ fun HomeScreen(
 
     val menuItems = listOf(
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
-        MenuItem("Home", Icons.Default.Home) {},
-        MenuItem("Offer a Service", Icons.Default.Add) {},
+        MenuItem("Home", Icons.Default.Home) {navHost.navigate(NavGraph.Home.route)},
+        MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) {}
     )
 
@@ -106,7 +106,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Emna",
+                        text = "Hello Emna",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )

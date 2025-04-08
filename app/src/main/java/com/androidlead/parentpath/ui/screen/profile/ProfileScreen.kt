@@ -78,7 +78,7 @@ fun ProfileScreen(
     val menuItems = listOf(
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
-        MenuItem("Offer a Service", Icons.Default.Add) { /* add navigation */ },
+        MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) { /* add navigation */ }
     )
 
