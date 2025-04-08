@@ -139,6 +139,7 @@ fun AddServiceScreen(
                     )
                 )
                 .padding(16.dp)
+                .systemBarsPadding()
         ) {
             // Header with menu icon and title
             Row(
@@ -284,7 +285,7 @@ fun ServiceCard(service: Service) {
             Text(
                 text = service.category,
                 style = MaterialTheme.typography.labelSmall,
-                color = PrimaryYellowDark,
+                color = PrimaryPink,
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .background(PrimaryYellowLight.copy(alpha = 0.2f))
@@ -301,14 +302,14 @@ fun ServiceCard(service: Service) {
                     Icon(
                         Icons.Default.Edit,
                         contentDescription = "Edit",
-                        tint = PrimaryPink
+                        tint = PrimaryYellowDark
                     )
                 }
                 IconButton(onClick = { /* Delete service */ }) {
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color.Red
+                        tint = Color(0xFFAA4B59)
                     )
                 }
             }
