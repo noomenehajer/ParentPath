@@ -3,16 +3,13 @@ package com.androidlead.parentpath.ui.screen.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -30,12 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
-import androidx.navigation.NavController
 
 // Data Models
 data class MenuItem(
@@ -77,14 +74,14 @@ fun HomeScreen(
     )
 
     val articles = listOf(
-        Article("5 Parenting Tips", "Boost your relationship with your kids.", R.drawable.article1),
+        Article("5 Parenting Tips", "Connect better with kids", R.drawable.article1),
         Article("Healthy Snacks", "Nutritious recipes for children.", R.drawable.article2),
         Article("Family Time Activities", "Fun things to do together at home.", R.drawable.article3)
     )
 
     val menuItems = listOf(
+        MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route)},
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
-        MenuItem("Home", Icons.Default.Home) {navHost.navigate(NavGraph.Home.route)},
         MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) {}
     )
@@ -142,210 +139,289 @@ fun HomeScreen(
             }
         }
     ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        0f to PrimaryPinkBlended,
-                        0.6f to PrimaryYellowLight,
-                        1f to PrimaryYellow
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "♡ Here For You ♡",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.DarkGray
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = Color.DarkGray
+                            )
+                        }
+                                        },
+                    actions = {
+                        IconButton(onClick = { }) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notifications",
+                                tint = Color.DarkGray
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        actionIconContentColor = Color.DarkGray
                     )
                 )
-                .verticalScroll(rememberScrollState())  // Add this to make the content scrollable
-                .systemBarsPadding()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(Icons.Default.Menu, contentDescription = "Menu")
-                }
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "♡ Here For You ♡",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Color.DarkGray,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notifications",
-                        tint = Color.DarkGray
-                    )
-                }
             }
-
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search...", color = Color.DarkGray) },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color.DarkGray)
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedBorderColor = Color.Gray,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = Color.Black,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { })
-            )
-
-            val categories = listOf("Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
-
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0f to PrimaryPinkBlended,
+                            0.6f to PrimaryYellowLight,
+                            1f to PrimaryYellow
+                        )
+                    )
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(categories.size) { index ->
-                    ElevatedAssistChip(
-                        onClick = {},
-                        label = {
-                            Text(
-                                text = categories[index],
-                                color = Color.DarkGray,
-                                fontWeight = FontWeight.SemiBold
+                item {
+                    // Search Bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        placeholder = { Text("Search...", color = Color.DarkGray) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = Color.DarkGray
                             )
                         },
-                        shape = RoundedCornerShape(20.dp),
-                        colors = AssistChipDefaults.elevatedAssistChipColors(containerColor = Color.White)
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = Color.Black,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { })
+                    )
+
+                    // Categories
+                    val categories = listOf("Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(categories) { category ->
+                            ElevatedAssistChip(
+                                onClick = {},
+                                label = {
+                                    Text(
+                                        text = category,
+                                        color = Color.DarkGray,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                },
+                                shape = RoundedCornerShape(20.dp),
+                                colors = AssistChipDefaults.elevatedAssistChipColors(
+                                    containerColor = Color.White
+                                )
+                            )
+                        }
+                    }
+                }
+
+                // Services Section
+                item {
+                    Text(
+                        text = "Services",
+                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.DarkGray
                     )
                 }
-            }
 
-            Text(
-                text = "Services",
-                modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
                 items(services) { service ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            // Remove this line 👇
-                            // .height(260.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                             .shadow(4.dp, RoundedCornerShape(16.dp)),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White)
-                    )
-                    {
-                        Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
                             Image(
                                 painter = painterResource(id = service.imageResId),
                                 contentDescription = service.name,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.height(140.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = service.name,
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                                color = Color.Black
-                            )
-                            Text(
-                                text = "by ${service.provider}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = service.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.DarkGray,
-                                maxLines = 2
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Button(
-                                onClick = { /* handle view details */ },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = "View Details",
-                                    color = Color.White,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Articles",
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(bottom = 16.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(articles.size) { index ->  // Keep the index-based version
-                    val article = articles[index]  // Get the article by index
-                    Card(
-                        modifier = Modifier
-                            .width(260.dp)
-                            .height(180.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Image(
-                                painter = painterResource(article.imageResId),
-                                contentDescription = article.title,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                            )
-                            Column(modifier = Modifier.padding(8.dp)) {
-                                Text(
-                                    text = article.title,
-                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    text = service.name,
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = article.description,
+                                    text = "by ${service.provider}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Gray
+                                )
+                                Text(
+                                    text = service.description,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.DarkGray,
-                                    maxLines = 2
+                                    maxLines = 2,
+                                    modifier = Modifier.padding(vertical = 4.dp)
                                 )
+                                Button(
+                                    onClick = { /* handle view details */ },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = PrimaryPink
+                                    )
+                                ) {
+                                    Text(
+                                        text = "View Details",
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Articles Section
+                item {
+                    Text(
+                        text = "Articles",
+                        modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 12.dp),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.DarkGray
+                    )
+                }
+
+                item {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        items(articles) { article ->
+                            Card(
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .height(240.dp),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    // Full-width image with aspect ratio
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(150.dp)
+                                            .clip(
+                                                RoundedCornerShape(
+                                                    topStart = 20.dp,
+                                                    topEnd = 20.dp
+                                                )
+                                            )
+                                    ) {
+                                        Image(
+                                            painter = painterResource(article.imageResId),
+                                            contentDescription = article.title,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                        // Gradient overlay for better text visibility
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    Brush.verticalGradient(
+                                                        colors = listOf(
+                                                            Color.Transparent,
+                                                            Color.Black.copy(alpha = 0.3f)
+                                                        ),
+                                                        startY = 100f
+                                                    )
+                                                )
+                                        )
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    ) {
+                                        Text(
+                                            text = article.title,
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            color = Color.Black,
+                                            maxLines = 1
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = article.description,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = Color.DarkGray,
+                                            maxLines = 2
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "Read more →",
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                fontWeight = FontWeight.SemiBold
+                                            ),
+                                            color = PrimaryPink
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-
         }
     }
 }
-
