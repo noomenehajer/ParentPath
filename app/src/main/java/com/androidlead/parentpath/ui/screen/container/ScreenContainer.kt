@@ -9,6 +9,7 @@ import com.androidlead.parentpath.ui.screen.login.LoginScreen
 import com.androidlead.parentpath.ui.screen.profile.ProfileScreen
 import com.androidlead.parentpath.ui.screen.registration.RegistrationScreen
 import com.androidlead.parentpath.ui.screen.service.AddServiceScreen
+import com.androidlead.parentpath.ui.screen.service.BookingScreen
 import com.androidlead.parentpath.ui.screen.welcome.WelcomeScreen
 
 @Composable
@@ -58,6 +59,14 @@ fun ScreenContainer() {
             AddServiceScreen(
                 onRestartFlowClicked = {
                     navHost.navigate(NavGraph.Service.route)
+                },
+                navHost = navHost
+            )
+        }
+        composable(NavGraph.Booking.route) {
+            BookingScreen(
+                onRestartFlowClicked = {
+                    navHost.navigate(NavGraph.Booking.route)
                 },
                 navHost = navHost
             )

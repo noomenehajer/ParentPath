@@ -83,7 +83,7 @@ fun HomeScreen(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route)},
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
         MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
-        MenuItem("Booking List", Icons.Default.List) {}
+        MenuItem("Booking List", Icons.Default.List) { navHost.navigate(NavGraph.Booking.route) }
     )
 
     ModalNavigationDrawer(

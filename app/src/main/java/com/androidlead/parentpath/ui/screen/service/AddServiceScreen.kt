@@ -57,9 +57,9 @@ fun AddServiceScreen(
     // Sample services data - now mutable so we can edit them
     val services = remember {
         mutableStateListOf(
-            Service("1", "Babysitting", "Professional childcare services", "$15/hr", "Childcare"),
-            Service("2", "Tutoring", "Math and science tutoring", "$20/hr", "Education"),
-            Service("3", "Pet Care", "Dog walking and pet sitting", "$12/hr", "Pets")
+            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare"),
+            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education"),
+            Service("3", "Pet Care", "Dog walking and pet sitting", "12TND/hr", "Pets")
         )
     }
 
@@ -67,7 +67,7 @@ fun AddServiceScreen(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
         MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
-        MenuItem("Booking List", Icons.Default.List) { /* add navigation */ }
+        MenuItem("Booking List", Icons.Default.List) { navHost.navigate(NavGraph.Booking.route) }
     )
 
     ModalNavigationDrawer(

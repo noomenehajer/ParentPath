@@ -1,14 +1,19 @@
-package com.androidlead.parentpath.ui.screen.profile
+package com.androidlead.parentpath.ui.screen.service
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -22,58 +27,30 @@ import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import com.androidlead.parentpath.ui.screen.container.NavGraph
-import com.androidlead.parentpath.ui.components.InputField
 
-
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.Modifier
-data class MenuItem(
-    val title: String,
-    val icon: ImageVector,
-    val onClick: () -> Unit
-)
-@Composable
-fun InputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholderText: String,
-    isPassword: Boolean = false
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(placeholderText, color = Color.DarkGray) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        shape = RoundedCornerShape(16.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Gray,
-            unfocusedBorderColor = Color.LightGray,
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = Color.Black,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White
-        ),
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
-    )
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
+fun BookingScreen(
     modifier: Modifier = Modifier,
     onRestartFlowClicked: () -> Unit,
     navHost: NavController
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var showAddServiceDialog by remember { mutableStateOf(false) }
+    var showEditServiceDialog by remember { mutableStateOf(false) }
+    var editingService by remember { mutableStateOf<Service?>(null) }
+
+    // Sample services data - now mutable so we can edit them
+    val services = remember {
+        mutableStateListOf(
+            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare"),
+            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education"),
+            Service("3", "Pet Care", "Dog walking and pet sitting", "12TND/hr", "Pets")
+        )
+    }
 
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
@@ -81,13 +58,6 @@ fun ProfileScreen(
         MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) { navHost.navigate(NavGraph.Booking.route) }
     )
-
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var bio by remember { mutableStateOf("") }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -160,70 +130,29 @@ fun ProfileScreen(
                     )
                 )
                 .padding(16.dp)
+                .systemBarsPadding()
         ) {
-            // Header with menu icon
+            // Header with menu icon and title
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp),
+                    .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
                     Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "My Booking List",
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.width(48.dp)) // To balance the menu icon
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.avatar),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    color = Color.DarkGray,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                InputField(value = name, onValueChange = { name = it }, placeholderText = "Name")
-                Spacer(modifier = Modifier.height(12.dp))
-                InputField(value = email, onValueChange = { email = it }, placeholderText = "Email")
-                Spacer(modifier = Modifier.height(12.dp))
-                InputField(value = password, onValueChange = { password = it }, placeholderText = "Password", isPassword = true)
-                Spacer(modifier = Modifier.height(12.dp))
-                InputField(value = address, onValueChange = { address = it }, placeholderText = "Address")
-                Spacer(modifier = Modifier.height(12.dp))
-                InputField(value = phone, onValueChange = { phone = it }, placeholderText = "Phone Number")
-                Spacer(modifier = Modifier.height(12.dp))
-                InputField(value = bio, onValueChange = { bio = it }, placeholderText = "Bio")
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = { /* Save profile changes */ },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFAA4B59),
-                        contentColor = Color(0xFFFFF5CC)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Save")
-
-                }
             }
+
         }
     }
 }
