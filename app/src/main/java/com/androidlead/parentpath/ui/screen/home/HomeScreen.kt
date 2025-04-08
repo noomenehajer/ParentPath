@@ -237,7 +237,9 @@ fun HomeScreen(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.height(400.dp)  // Add fixed height to prevent taking all space
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
                 items(services) { service ->
                     Card(
