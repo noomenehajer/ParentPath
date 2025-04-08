@@ -51,10 +51,12 @@ fun AddServiceScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showAddServiceDialog by remember { mutableStateOf(false) }
+    var showEditServiceDialog by remember { mutableStateOf(false) }
+    var editingService by remember { mutableStateOf<Service?>(null) }
 
-    // Sample services data
+    // Sample services data - now mutable so we can edit them
     val services = remember {
-        listOf(
+        mutableStateListOf(
             Service("1", "Babysitting", "Professional childcare services", "$15/hr", "Childcare"),
             Service("2", "Tutoring", "Math and science tutoring", "$20/hr", "Education"),
             Service("3", "Pet Care", "Dog walking and pet sitting", "$12/hr", "Pets")
@@ -64,7 +66,7 @@ fun AddServiceScreen(
     val menuItems = listOf(
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
-        MenuItem("Offer a Service", Icons.Default.Add) {navHost.navigate(NavGraph.Service.route) },
+        MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) { /* add navigation */ }
     )
 
@@ -177,142 +179,241 @@ fun AddServiceScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(services) { service ->
-                    ServiceCard(service = service)
+                    ServiceCard(
+                        service = service,
+                        onEditClick = {
+                            editingService = service
+                            showEditServiceDialog = true
+                        },
+                        onDeleteClick = {
+                            services.remove(service)
+                        }
+                    )
                 }
+            }
+
+            // Add Service Dialog (existing code remains the same)
+            if (showAddServiceDialog) {
+                var title by remember { mutableStateOf("") }
+                var description by remember { mutableStateOf("") }
+                var price by remember { mutableStateOf("") }
+                var category by remember { mutableStateOf("") }
+
+                AlertDialog(
+                    onDismissRequest = { showAddServiceDialog = false },
+                    title = { Text("Add New Service") },
+                    text = {
+                        Column {
+                            OutlinedTextField(
+                                value = title,
+                                onValueChange = { title = it },
+                                label = { Text("Service Title") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = description,
+                                onValueChange = { description = it },
+                                label = { Text("Description") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = price,
+                                onValueChange = { price = it },
+                                label = { Text("Price") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = category,
+                                onValueChange = { category = it },
+                                label = { Text("Category") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                services.add(
+                                    Service(
+                                        id = (services.size + 1).toString(),
+                                        title = title,
+                                        description = description,
+                                        price = price,
+                                        category = category
+                                    )
+                                )
+                                showAddServiceDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
+                        ) {
+                            Text("Add Service")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showAddServiceDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
+            // Edit Service Dialog (new code)
+            if (showEditServiceDialog && editingService != null) {
+                var title by remember { mutableStateOf(editingService!!.title) }
+                var description by remember { mutableStateOf(editingService!!.description) }
+                var price by remember { mutableStateOf(editingService!!.price) }
+                var category by remember { mutableStateOf(editingService!!.category) }
+
+                AlertDialog(
+                    onDismissRequest = { showEditServiceDialog = false },
+                    title = { Text("Edit Service") },
+                    text = {
+                        Column {
+                            OutlinedTextField(
+                                value = title,
+                                onValueChange = { title = it },
+                                label = { Text("Service Title") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = description,
+                                onValueChange = { description = it },
+                                label = { Text("Description") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = price,
+                                onValueChange = { price = it },
+                                label = { Text("Price") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = category,
+                                onValueChange = { category = it },
+                                label = { Text("Category") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                val index = services.indexOfFirst { it.id == editingService!!.id }
+                                if (index != -1) {
+                                    services[index] = services[index].copy(
+                                        title = title,
+                                        description = description,
+                                        price = price,
+                                        category = category
+                                    )
+                                }
+                                showEditServiceDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
+                        ) {
+                            Text("Save Changes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showEditServiceDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }
-
-    // Add Service Dialog
-    if (showAddServiceDialog) {
-        AlertDialog(
-            onDismissRequest = { showAddServiceDialog = false },
-            title = { Text("Add New Service") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { /* Handle input */ },
-                        label = { Text("Service Title") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { /* Handle input */ },
-                        label = { Text("Description") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { /* Handle input */ },
-                        label = { Text("Price") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { /* Handle input */ },
-                        label = { Text("Category") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = { showAddServiceDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
-                ) {
-                    Text("Add Service")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showAddServiceDialog = false }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
 }
 
-@Composable
-fun ServiceCard(service: Service) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        @Composable
+        fun ServiceCard(
+            service: Service,
+            onEditClick: () -> Unit,
+            onDeleteClick: () -> Unit
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = service.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = service.price,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryPink
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = service.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = service.category,
-                style = MaterialTheme.typography.labelSmall,
-                color = PrimaryPink,
+            Card(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(PrimaryYellowLight.copy(alpha = 0.2f))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.9f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                IconButton(onClick = { /* Edit service */ }) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = PrimaryYellowDark
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = service.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
+                        Text(
+                            text = service.price,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryPink
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = service.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
                     )
-                }
-                IconButton(onClick = { /* Delete service */ }) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color(0xFFAA4B59)
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = service.category,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = PrimaryYellowDark,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(PrimaryYellowLight.copy(alpha = 0.2f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = onEditClick) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = PrimaryYellowDark
+                            )
+                        }
+                        IconButton(onClick = onDeleteClick) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color(0xFFAA4B59)
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
-}
