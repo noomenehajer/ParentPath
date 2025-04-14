@@ -43,15 +43,6 @@ fun BookingScreen(
     var showEditServiceDialog by remember { mutableStateOf(false) }
     var editingService by remember { mutableStateOf<Service?>(null) }
 
-    // Sample services data - now mutable so we can edit them
-    val services = remember {
-        mutableStateListOf(
-            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare"),
-            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education"),
-            Service("3", "Pet Care", "Dog walking and pet sitting", "12TND/hr", "Pets")
-        )
-    }
-
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
         MenuItem("Edit Profile", Icons.Default.Person) { navHost.navigate(NavGraph.Profile.route) },

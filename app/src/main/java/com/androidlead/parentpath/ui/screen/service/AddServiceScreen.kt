@@ -38,8 +38,10 @@ data class Service(
     val title: String,
     val description: String,
     val price: String,
-    val category: String
+    val category: String,
+    val imageRes: Int
 )
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,9 +59,9 @@ fun AddServiceScreen(
     // Sample services data - now mutable so we can edit them
     val services = remember {
         mutableStateListOf(
-            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare"),
-            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education"),
-            Service("3", "Pet Care", "Dog walking and pet sitting", "12TND/hr", "Pets")
+            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare", R.drawable.babysitter),
+            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education", R.drawable.tutor),
+            Service("3", "Fitness", "Fitness health care", "12TND/hr", "Pets", R.drawable.fitness)
         )
     }
 
@@ -192,18 +194,33 @@ fun AddServiceScreen(
                 }
             }
 
-            // Add Service Dialog (existing code remains the same)
             if (showAddServiceDialog) {
                 var title by remember { mutableStateOf("") }
                 var description by remember { mutableStateOf("") }
                 var price by remember { mutableStateOf("") }
                 var category by remember { mutableStateOf("") }
+                var selectedImage by remember { mutableStateOf(R.drawable.cleaning) } // Default image
 
                 AlertDialog(
                     onDismissRequest = { showAddServiceDialog = false },
                     title = { Text("Add New Service") },
                     text = {
                         Column {
+                            // Image preview and selection
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(selectedImage),
+                                    contentDescription = "Service Image",
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                // In a real app, you would implement image selection here
+                                Text("Default image selected", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+
                             OutlinedTextField(
                                 value = title,
                                 onValueChange = { title = it },
@@ -242,7 +259,8 @@ fun AddServiceScreen(
                                         title = title,
                                         description = description,
                                         price = price,
-                                        category = category
+                                        category = category,
+                                        imageRes = selectedImage
                                     )
                                 )
                                 showAddServiceDialog = false
@@ -351,67 +369,84 @@ fun AddServiceScreen(
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Column(
+                Row(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = service.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-                        Text(
-                            text = service.price,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryPink
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = service.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = service.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = PrimaryYellowDark,
+                    // Image on the left
+                    Image(
+                        painter = painterResource(service.imageRes),
+                        contentDescription = service.title,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(PrimaryYellowLight.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                    // Content on the right
+                    Column(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        IconButton(onClick = onEditClick) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Edit",
-                                tint = PrimaryYellowDark
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = service.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.DarkGray
+                            )
+                            Text(
+                                text = service.price,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryPink
                             )
                         }
-                        IconButton(onClick = onDeleteClick) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                tint = Color(0xFFAA4B59)
-                            )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = service.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = service.category,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = PrimaryYellowDark,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(PrimaryYellowLight.copy(alpha = 0.2f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(onClick = onEditClick) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    tint = PrimaryYellowDark
+                                )
+                            }
+                            IconButton(onClick = onDeleteClick) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color(0xFFAA4B59)
+                                )
+                            }
                         }
                     }
                 }
