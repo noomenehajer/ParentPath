@@ -34,8 +34,10 @@ data class Booking(
     val id: Int,
     val serviceName: String,
     val serviceDate: String,
-    val price: String
+    val price: String,
+    val isPaid: Boolean = false // Add this field
 )
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,11 +52,12 @@ fun BookingScreen(
 
     val bookings = remember {
         mutableStateListOf(
-            Booking(1, "Babysitting", "2025-05-05", "30"),
+            Booking(1, "Babysitting", "2025-05-05", "30", isPaid = true),// Marked as paid
             Booking(2, "Private Tutoring", "2025-05-10", "50"),
             Booking(3, "Cooking Assistance", "2025-05-12", "40")
         )
     }
+
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var bookingToDelete by remember { mutableStateOf<Booking?>(null) }
@@ -169,7 +172,6 @@ fun BookingScreen(
                             Text("Service: ${booking.serviceName}", fontWeight = FontWeight.Bold)
                             Text("Date: ${booking.serviceDate}")
                             Text("Price: ${booking.price} TND")
-
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -177,26 +179,37 @@ fun BookingScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Button(
-                                    onClick = {
-                                        val paypalUrl =
-                                            "https://www.paypal.com/checkoutnow\"${booking.price}"
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
-                                        context.startActivity(intent)
+                                if (booking.isPaid) {
+                                    Text(
+                                        text = "Paid ✅",
+                                        color = Color(0xFF2E7D32), // Green color
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                } else {
+                                    Button(
+                                        onClick = {
+                                            val paypalUrl = "https://www.paypal.com/checkoutnow\"${booking.price}"
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
+                                            context.startActivity(intent)
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Pay Now")
                                     }
-                                ) {
-                                    Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Pay Now")
-                                }
 
-                                IconButton(onClick = {
-                                    bookingToDelete = booking
-                                    showDeleteDialog = true
-                                }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                    Button(
+                                        onClick = {
+                                            bookingToDelete = booking
+                                            showDeleteDialog = true
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                                    ) {
+                                        Text("Cancel", color = Color.White)
+                                    }
                                 }
                             }
+
                         }
                     }
                 }

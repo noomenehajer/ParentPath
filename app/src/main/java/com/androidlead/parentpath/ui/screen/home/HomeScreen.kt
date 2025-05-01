@@ -257,7 +257,27 @@ fun HomeScreen(
                     )
                 }
 
-                items(services) { service ->
+                val filteredServices = services.filter {
+                    it.name.contains(searchQuery, ignoreCase = true)
+                }
+
+                if (filteredServices.isEmpty()) {
+                    item {
+                        Text(
+                            text = "Oops! No services in your area yet.",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                textAlign = TextAlign.Center
+                            ),
+                            color = Color.DarkGray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    items(filteredServices) { service ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -320,6 +340,7 @@ fun HomeScreen(
                     }
                 }
 
+            }
                 // Articles Section
                 item {
                     Text(
