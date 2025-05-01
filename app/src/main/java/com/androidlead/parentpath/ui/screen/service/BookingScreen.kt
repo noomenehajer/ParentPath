@@ -1,8 +1,10 @@
 package com.androidlead.parentpath.ui.screen.service
 
-
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,18 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
-import androidx.navigation.NavController
-import com.androidlead.parentpath.ui.screen.container.NavGraph
 
-
+data class Booking(
+    val id: Int,
+    val serviceName: String,
+    val serviceDate: String,
+    val price: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +46,18 @@ fun BookingScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var showAddServiceDialog by remember { mutableStateOf(false) }
-    var showEditServiceDialog by remember { mutableStateOf(false) }
-    var editingService by remember { mutableStateOf<Service?>(null) }
+    val context = LocalContext.current
+
+    val bookings = remember {
+        mutableStateListOf(
+            Booking(1, "Babysitting", "2025-05-05", "30"),
+            Booking(2, "Private Tutoring", "2025-05-10", "50"),
+            Booking(3, "Cooking Assistance", "2025-05-12", "40")
+        )
+    }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var bookingToDelete by remember { mutableStateOf<Booking?>(null) }
 
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
@@ -123,7 +139,6 @@ fun BookingScreen(
                 .padding(16.dp)
                 .systemBarsPadding()
         ) {
-            // Header with menu icon and title
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,7 +148,6 @@ fun BookingScreen(
                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
                     Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
-                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = "My Booking List",
                     style = MaterialTheme.typography.titleLarge,
@@ -141,9 +155,77 @@ fun BookingScreen(
                     color = Color.DarkGray,
                     modifier = Modifier.weight(1f)
                 )
-
             }
 
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(bookings) { booking ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(6.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Service: ${booking.serviceName}", fontWeight = FontWeight.Bold)
+                            Text("Date: ${booking.serviceDate}")
+                            Text("Price: ${booking.price} TND")
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val paypalUrl =
+                                            "https://www.paypal.com/checkoutnow\"${booking.price}"
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
+                                        context.startActivity(intent)
+                                    }
+                                ) {
+                                    Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Pay Now")
+                                }
+
+                                IconButton(onClick = {
+                                    bookingToDelete = booking
+                                    showDeleteDialog = true
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (showDeleteDialog && bookingToDelete != null) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = { Text("Cancel Booking") },
+                    text = { Text("Are you sure you want to cancel this booking?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            bookings.remove(bookingToDelete)
+                            showDeleteDialog = false
+                            bookingToDelete = null
+                        }) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showDeleteDialog = false
+                            bookingToDelete = null
+                        }) {
+                            Text("No")
+                        }
+                    }
+                )
+            }
         }
     }
 }

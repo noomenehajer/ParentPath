@@ -8,5 +8,7 @@ sealed class NavGraph(val route: String) {
     data object  Profile :NavGraph(route="profile_screen")
     data object  Service :NavGraph(route="Service_screen")
     data object  Booking :NavGraph(route="Booking_screen")
+    data object  Article :NavGraph(route="Article_details")
+    data object  Details :NavGraph(route="Service_details")
 
    }

@@ -2,6 +2,7 @@ package com.androidlead.parentpath.ui.screen.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -302,7 +303,7 @@ fun HomeScreen(
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 )
                                 Button(
-                                    onClick = { /* handle view details */ },
+                                    onClick = { navHost.navigate(NavGraph.Details.route) },
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
@@ -343,7 +344,8 @@ fun HomeScreen(
                             Card(
                                 modifier = Modifier
                                     .width(300.dp)
-                                    .height(240.dp),
+                                    .height(240.dp)
+                                    .clickable { navHost.navigate(NavGraph.Article.route) },
                                 shape = RoundedCornerShape(20.dp),
                                 colors = CardDefaults.cardColors(
                                     containerColor = Color.White
@@ -353,17 +355,11 @@ fun HomeScreen(
                                 Column(
                                     modifier = Modifier.fillMaxSize()
                                 ) {
-                                    // Full-width image with aspect ratio
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(150.dp)
-                                            .clip(
-                                                RoundedCornerShape(
-                                                    topStart = 20.dp,
-                                                    topEnd = 20.dp
-                                                )
-                                            )
+                                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                                     ) {
                                         Image(
                                             painter = painterResource(article.imageResId),
@@ -371,7 +367,6 @@ fun HomeScreen(
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.fillMaxSize()
                                         )
-                                        // Gradient overlay for better text visibility
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxSize()
