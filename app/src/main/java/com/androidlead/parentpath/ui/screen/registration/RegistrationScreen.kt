@@ -21,6 +21,7 @@ import com.androidlead.parentpath.ui.theme.PrimaryYellowLight
 import com.androidlead.parentpath.viewmodel.UserViewModel
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import com.androidlead.parentpath.ui.components.InputField
+
 @Composable
 fun RegistrationScreen(
     modifier: Modifier = Modifier,
@@ -32,10 +33,11 @@ fun RegistrationScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
 
     AuthenticationScreenTemplate(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         backgroundGradient = arrayOf(
             0f to PrimaryPinkBlended,
             0.6f to PrimaryYellowLight,
@@ -56,12 +58,17 @@ fun RegistrationScreen(
         ),
         actionButtonShadow = PrimaryYellowDark,
         onMainActionButtonClicked = {
-            if (email.isBlank() || password.isBlank()) {
+            if (fullName.isBlank()||  email.isBlank() || password.isBlank() ) {
                 message = "Please fill in all fields"
                 return@AuthenticationScreenTemplate
             }
-            
-            val success = viewModel.registerUser(User(email, password))
+
+            val user = User(
+                email = email,
+                password = password
+            )
+            val success = viewModel.registerUser(user)
+
             message = if (success) {
                 onLoginClicked()
                 "Registration successful! Please login"
@@ -72,34 +79,40 @@ fun RegistrationScreen(
         onSecondaryActionButtonClicked = onLoginClicked
     ) {
         Column(
-    modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp)
-) {
-    InputField(
-        value = email,
-        onValueChange = { email = it },
-        leadingIconRes = R.drawable.ic_email, // Make sure this exists in your res/drawable
-        placeholderText = "Email"
-    )
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            InputField(
+                value = fullName,
+                onValueChange = { fullName = it },
+                leadingIconRes = R.drawable.ic_user,
+                placeholderText = "Full Name"
+            )
 
-    Spacer(modifier = Modifier.height(12.dp))
+            InputField(
+                value = email,
+                onValueChange = { email = it },
+                leadingIconRes = R.drawable.ic_email,
+                placeholderText = "Email"
+            )
 
-    InputField(
-        value = password,
-        onValueChange = { password = it },
-        visualTransformation = PasswordVisualTransformation(),
-        leadingIconRes = R.drawable.ic_lock, // Make sure this exists in your res/drawable
-        placeholderText = "Password"
-    )
+            InputField(
+                value = password,
+                onValueChange = { password = it },
+                visualTransformation = PasswordVisualTransformation(),
+                leadingIconRes = R.drawable.ic_lock,
+                placeholderText = "Password"
+            )
 
-    if (message.isNotEmpty()) {
-        Text(
-            text = message,
-            color = Color.Red,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-    }
-}
+            if (message.isNotEmpty()) {
+                Text(
+                    text = message,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
     }
 }
