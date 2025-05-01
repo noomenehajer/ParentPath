@@ -67,5 +67,11 @@ dependencies {
     implementation ("androidx.compose.ui:ui:1.5.0")
     implementation ("androidx.compose.material:material:1.5.0")
     implementation ("androidx.compose.material3:material3:1.1.0")
+// For image picking
+    implementation ("com.google.accompanist:accompanist-permissions:0.28.0")
 
+// For calendar and time pickers
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.0.3")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.0.3")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.0.3")
 }

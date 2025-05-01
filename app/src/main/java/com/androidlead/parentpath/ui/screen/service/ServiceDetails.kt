@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -22,11 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.androidlead.parentpath.R
+import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
-import androidx.navigation.NavController
-import com.androidlead.parentpath.ui.screen.container.NavGraph
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,7 +50,9 @@ fun ServiceDetails(
             ModalDrawerSheet(modifier = Modifier.width(240.dp)) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
@@ -101,6 +104,7 @@ fun ServiceDetails(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .background(Brush.verticalGradient(
                     0f to PrimaryPinkBlended,
                     0.6f to PrimaryYellowLight,
@@ -124,7 +128,7 @@ fun ServiceDetails(
             Spacer(modifier = Modifier.height(16.dp))
 
             Image(
-                painter = painterResource(R.drawable.babysitter),
+                painter = painterResource(R.drawable.cleaning),
                 contentDescription = "Service Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -135,10 +139,16 @@ fun ServiceDetails(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("Service Title", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("By: Provider Name", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+            Text("home Cleaning", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("By: Maya K ", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("This is a description of the service. It explains what the service offers and how it helps the user.", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "Sparkling Clean Homes, Effortless Living\n" +
+                        "Our professional home cleaning service delivers spotless, sanitized spaces so you can enjoy more free time. " +
+                        "With trained cleaners, eco-friendly products, and attention to detail, we handle everything from routine dusting " +
+                        "to deep cleaning—tailored to your needs. Book now and come home to freshness!\n",
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Text("Price: \$29.99", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
 
@@ -147,7 +157,7 @@ fun ServiceDetails(
             Text("Select Date", style = MaterialTheme.typography.titleMedium)
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 getDatesOfWeek().forEach { date ->
-                    val isSelected = selectedDate.value == date
+                    val isSelected = isSameDay(selectedDate.value, date)
                     Card(
                         colors = CardDefaults.cardColors(containerColor = if (isSelected) PrimaryPink else Color.White),
                         modifier = Modifier
@@ -188,7 +198,7 @@ fun ServiceDetails(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Book Now and Pay")
+                Text("Book Now")
             }
 
             if (showDialog.value) {
@@ -202,7 +212,6 @@ fun ServiceDetails(
                         TextButton(
                             onClick = {
                                 showDialog.value = false
-                                // Simulate redirection
                                 navHost.navigate(NavGraph.Booking.route)
                             }
                         ) {
@@ -229,4 +238,10 @@ private fun getDatesOfWeek(): List<Date> {
     }
 }
 
-
+private fun isSameDay(date1: Date, date2: Date): Boolean {
+    val cal1 = Calendar.getInstance().apply { time = date1 }
+    val cal2 = Calendar.getInstance().apply { time = date2 }
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+            cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
+}
