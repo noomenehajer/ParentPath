@@ -75,9 +75,9 @@ fun HomeScreen(
     )
 
     val articles = listOf(
-        Article("5 Parenting Tips", "Connect better with kids", R.drawable.article1),
-        Article("Healthy Snacks", "Nutritious recipes for children.", R.drawable.article2),
-        Article("Family Time Activities", "Fun things to do together at home.", R.drawable.article3)
+        Article("The Art of Parenting", "Tips for Happy Kids", R.drawable.article1),
+        Article("Healthy Snacks", "Nutritious recipes for children", R.drawable.article2),
+        Article("Family Time Activities", "Fun things to do together at home", R.drawable.article3)
     )
 
     val menuItems = listOf(
@@ -104,7 +104,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Hello Emna",
+                        text = "Hello Sarra",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )

@@ -30,14 +30,20 @@ import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
 
+// Enum for booking status
+enum class BookingStatus {
+    WAITING_APPROVAL,
+    APPROVED,
+    PAID
+}
+
 data class Booking(
     val id: Int,
     val serviceName: String,
     val serviceDate: String,
     val price: String,
-    val isPaid: Boolean = false // Add this field
+    val status: BookingStatus = BookingStatus.WAITING_APPROVAL // Changed to status enum
 )
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,12 +58,12 @@ fun BookingScreen(
 
     val bookings = remember {
         mutableStateListOf(
-            Booking(1, "Babysitting", "2025-05-05", "30", isPaid = true),// Marked as paid
-            Booking(2, "Private Tutoring", "2025-05-10", "50"),
-            Booking(3, "Cooking Assistance", "2025-05-12", "40")
+            Booking(1, "Babysitting", "2025-05-05", "30", BookingStatus.PAID),
+            Booking(2, "Private Tutoring", "2025-05-10", "50", BookingStatus.WAITING_APPROVAL),
+            Booking(3, "Private Tutoring", "2025-05-12", "45", BookingStatus.APPROVED),
+            Booking(4, "Cooking Assistance", "2025-05-15", "40", BookingStatus.PAID)
         )
     }
-
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var bookingToDelete by remember { mutableStateOf<Booking?>(null) }
@@ -124,8 +130,7 @@ fun BookingScreen(
                         scope.launch { drawerState.close() }
                         onRestartFlowClicked()
                     },
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                )
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
             }
         }
     ) {
@@ -172,6 +177,35 @@ fun BookingScreen(
                             Text("Service: ${booking.serviceName}", fontWeight = FontWeight.Bold)
                             Text("Date: ${booking.serviceDate}")
                             Text("Price: ${booking.price} TND")
+
+                            // Status indicator
+                            when (booking.status) {
+                                BookingStatus.WAITING_APPROVAL -> {
+                                    Text(
+                                        text = "Waiting for provider approval",
+                                        color = Color(0xFFFB8C00), // Orange color
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                }
+                                BookingStatus.APPROVED -> {
+                                    Text(
+                                        text = "Approved - Ready to pay",
+                                        color = Color(0xFF1976D2), // Blue color
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                }
+                                BookingStatus.PAID -> {
+                                    Text(
+                                        text = "Paid ✅",
+                                        color = Color(0xFF2E7D32), // Green color
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                }
+                            }
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -179,37 +213,56 @@ fun BookingScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                if (booking.isPaid) {
-                                    Text(
-                                        text = "Paid ✅",
-                                        color = Color(0xFF2E7D32), // Green color
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                } else {
-                                    Button(
-                                        onClick = {
-                                            val paypalUrl = "https://www.paypal.com/checkoutnow\"${booking.price}"
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
-                                            context.startActivity(intent)
+                                when (booking.status) {
+                                    BookingStatus.WAITING_APPROVAL -> {
+                                        // Only show cancel button while waiting for approval
+                                        Button(
+                                            onClick = {
+                                                bookingToDelete = booking
+                                                showDeleteDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                                        ) {
+                                            Text("Cancel", color = Color.White)
                                         }
-                                    ) {
-                                        Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Pay Now")
                                     }
+                                    BookingStatus.APPROVED -> {
+                                        // Show both pay and cancel buttons when approved
+                                        Button(
+                                            onClick = {
+                                                val paypalUrl = "https://www.paypal.com/checkoutnow?amount=${booking.price}"
+                                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
+                                                context.startActivity(intent)
 
-                                    Button(
-                                        onClick = {
-                                            bookingToDelete = booking
-                                            showDeleteDialog = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                                    ) {
-                                        Text("Cancel", color = Color.White)
+                                                // Update status to paid after payment
+                                                val index = bookings.indexOf(booking)
+                                                if (index != -1) {
+                                                    bookings[index] = booking.copy(status = BookingStatus.PAID)
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                                        ) {
+                                            Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text("Pay Now")
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                bookingToDelete = booking
+                                                showDeleteDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                                        ) {
+                                            Text("Cancel", color = Color.White)
+                                        }
+                                    }
+                                    BookingStatus.PAID -> {
+                                        // No actions needed for paid bookings
+                                        Spacer(modifier = Modifier)
                                     }
                                 }
                             }
-
                         }
                     }
                 }

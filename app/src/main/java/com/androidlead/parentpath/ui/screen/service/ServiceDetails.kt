@@ -1,14 +1,9 @@
 package com.androidlead.parentpath.ui.screen.service
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -18,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,10 +32,8 @@ fun ServiceDetails(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
     val selectedDate = remember { mutableStateOf(getDatesOfWeek()[0]) }
     val selectedTime = remember { mutableStateOf("10:00 AM") }
-
     val showDialog = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
@@ -50,10 +42,8 @@ fun ServiceDetails(
             ModalDrawerSheet(modifier = Modifier.width(240.dp)) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     Image(
                         painter = painterResource(R.drawable.avatar),
@@ -62,7 +52,7 @@ fun ServiceDetails(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Emna", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Hello Sarra", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -117,7 +107,7 @@ fun ServiceDetails(
                     Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
                 Text(
-                    text = "Service Details",
+                    text = "",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray,
@@ -139,30 +129,51 @@ fun ServiceDetails(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("home Cleaning", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("By: Maya K ", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Home Cleaning",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = "By: Maya K",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 "Sparkling Clean Homes, Effortless Living\n" +
-                        "Our professional home cleaning service delivers spotless, sanitized spaces so you can enjoy more free time. " +
-                        "With trained cleaners, eco-friendly products, and attention to detail, we handle everything from routine dusting " +
-                        "to deep cleaning—tailored to your needs. Book now and come home to freshness!\n",
+                        "Let our professional team take the stress out of your routine. " +
+                        "We provide top-quality cleaning using eco-friendly products, tailored to your needs. " +
+                        "Enjoy more time for yourself in a fresh, spotless space.",
                 style = MaterialTheme.typography.bodyMedium
             )
+
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Price: \$29.99", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+            Text("Price: 20DT/Hour", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Select Date", style = MaterialTheme.typography.titleMedium)
+            Text(" Select a Date", style = MaterialTheme.typography.titleMedium)
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 getDatesOfWeek().forEach { date ->
                     val isSelected = isSameDay(selectedDate.value, date)
                     Card(
                         colors = CardDefaults.cardColors(containerColor = if (isSelected) PrimaryPink else Color.White),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { selectedDate.value = date }
+                        modifier = Modifier.padding(4.dp).clickable { selectedDate.value = date }
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(SimpleDateFormat("EEE", Locale.getDefault()).format(date), fontWeight = FontWeight.Bold)
@@ -174,15 +185,13 @@ fun ServiceDetails(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Select Time", style = MaterialTheme.typography.titleMedium)
+            Text(" Select a Time", style = MaterialTheme.typography.titleMedium)
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 listOf("10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM").forEach { time ->
                     val isSelected = selectedTime.value == time
                     Card(
                         colors = CardDefaults.cardColors(containerColor = if (isSelected) PrimaryPink else Color.White),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { selectedTime.value = time }
+                        modifier = Modifier.padding(4.dp).clickable { selectedTime.value = time }
                     ) {
                         Box(modifier = Modifier.padding(12.dp)) {
                             Text(time)
@@ -206,7 +215,7 @@ fun ServiceDetails(
                     onDismissRequest = { showDialog.value = false },
                     title = { Text("Confirm Booking") },
                     text = {
-                        Text("You are about to book this service on ${SimpleDateFormat("dd MMM", Locale.getDefault()).format(selectedDate.value)} at ${selectedTime.value}. Proceed to PayPal?")
+                        Text("You're about to book this service on ${SimpleDateFormat("dd MMM", Locale.getDefault()).format(selectedDate.value)} at ${selectedTime.value}.")
                     },
                     confirmButton = {
                         TextButton(
@@ -245,3 +254,5 @@ private fun isSameDay(date1: Date, date2: Date): Boolean {
             cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
             cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
 }
+
+

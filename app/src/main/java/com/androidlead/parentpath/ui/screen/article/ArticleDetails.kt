@@ -18,13 +18,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.screen.service.MenuItem
-import com.androidlead.parentpath.ui.screen.service.Service
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -34,9 +36,39 @@ fun ArticleDetails(
     modifier: Modifier = Modifier,
     navHost: NavController,
     onRestartFlowClicked: () -> Unit,
-    articleImageRes: Int = R.drawable.article1, // default image
-    articleTitle: String = "Understanding Early Childhood Education",
-    articleContent: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vitae..."
+    articleImageRes: Int = R.drawable.article1,
+    articleTitle: String = "The Art of Parenting",
+    articleContent: String = """
+        1. Love & Connection
+        
+        Spend quality time daily.
+        Listen actively—validate feelings.
+        Hug often; show unconditional love.
+        
+        2. Encourage Independence
+        
+        Offer simple choices (e.g., "Red or blue shirt?").
+        Let them try tasks alone (even if messy).
+        Praise effort, not just results.
+        
+        3. Set Clear Boundaries
+        
+        Keep rules simple and consistent.
+        Stay calm when correcting behavior.
+        Model kindness and patience.
+        
+        4. Boost Learning & Social Skills
+        
+        Play together—it builds creativity.
+        Read daily for language growth.
+        Teach sharing and empathy.
+        
+        5. Take Care of YOU
+        
+        Breathe—parenting is hard!
+        Ask for help when needed.
+        Small moments of self-care matter.
+    """.trimIndent()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -53,18 +85,21 @@ fun ArticleDetails(
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.width(240.dp)) {
                 Spacer(modifier = Modifier.height(24.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Image(
                         painter = painterResource(R.drawable.avatar),
                         contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape),
+                        modifier = Modifier.size(80.dp).clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Emna",
+                        text = "Hello Sarra",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -80,7 +115,7 @@ fun ArticleDetails(
                         label = { Text(item.title) },
                         selected = false,
                         onClick = {
-                            scope.launch { drawerState.close() }
+                            scope.launch{ drawerState.close() }
                             item.onClick()
                         },
                         modifier = Modifier.padding(horizontal = 12.dp)
@@ -110,7 +145,6 @@ fun ArticleDetails(
                 .verticalScroll(rememberScrollState())
                 .systemBarsPadding()
         ) {
-            // Top Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -129,7 +163,6 @@ fun ArticleDetails(
                 )
             }
 
-            // Article Image
             Image(
                 painter = painterResource(id = articleImageRes),
                 contentDescription = "Article Image",
@@ -141,7 +174,6 @@ fun ArticleDetails(
                     .clip(RoundedCornerShape(12.dp))
             )
 
-            // Article Title
             Text(
                 text = articleTitle,
                 style = MaterialTheme.typography.headlineSmall,
@@ -152,7 +184,20 @@ fun ArticleDetails(
                     .align(Alignment.CenterHorizontally)
             )
 
-            // Article Content
+            val formattedContent = buildAnnotatedString {
+                val boldStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                val regularStyle = SpanStyle(fontWeight = FontWeight.Normal)
+
+                articleContent.lines().forEach { line ->
+                    if (line.matches(Regex("^\\d+\\.\\s.*"))) {
+                        withStyle(boldStyle) { append(line) }
+                    } else {
+                        withStyle(regularStyle) { append(line) }
+                    }
+                    append("\n")
+                }
+            }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,12 +207,39 @@ fun ArticleDetails(
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Text(
-                    text = articleContent,
+                    text = formattedContent,
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.DarkGray,
                     modifier = Modifier.padding(16.dp)
                 )
             }
         }
+
+      /*  Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                FloatingActionButton(
+                    onClick = { /* Share action */ },
+                    containerColor = PrimaryPink,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                FloatingActionButton(
+                    onClick = { /* Bookmark action */ },
+                    containerColor = PrimaryYellow,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = "Bookmark", tint = Color.White)
+                }
+            }
+        }*/
     }
 }

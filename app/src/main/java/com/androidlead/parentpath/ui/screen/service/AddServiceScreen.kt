@@ -73,7 +73,7 @@ fun AddServiceScreen(
     // Sample services data - moved inside the composable
     val services = remember {
         mutableStateListOf(
-            Service("1", "Babysitting", "Professional childcare services", "15TND/hr", "Childcare", R.drawable.babysitter),
+            Service("1", "Babysitting", "Childcare services", "15TND/hr", "Childcare", R.drawable.babysitter),
             Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education", R.drawable.tutor),
             Service("3", "Fitness", "Fitness health care", "12TND/hr", "Pets", R.drawable.fitness)
         )
@@ -107,7 +107,7 @@ fun AddServiceScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Emna",
+                        text = "Hello Sarra",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
