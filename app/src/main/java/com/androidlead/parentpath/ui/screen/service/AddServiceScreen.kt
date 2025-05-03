@@ -52,7 +52,7 @@ data class Service(
     val title: String,
     val description: String,
     val price: String,
-    val category: String,
+   // val category: String,
     val imageRes: Int,
     val availabilities: List<Availability> = emptyList()
 )
@@ -73,9 +73,9 @@ fun AddServiceScreen(
     // Sample services data - moved inside the composable
     val services = remember {
         mutableStateListOf(
-            Service("1", "Babysitting", "Childcare services", "15TND/hr", "Childcare", R.drawable.babysitter),
-            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", "Education", R.drawable.tutor),
-            Service("3", "Fitness", "Fitness health care", "12TND/hr", "Pets", R.drawable.fitness)
+            Service("1", "Babysitting", "Childcare services", "15TND/hr",  R.drawable.babysitter),
+            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr",  R.drawable.tutor),
+            Service("3", "Fitness Coach", "Fitness health care", "12TND/hr",  R.drawable.fitness)
         )
     }
 
@@ -247,7 +247,7 @@ private fun AddEditServiceDialog(
     var title by remember { mutableStateOf(service?.title ?: "") }
     var description by remember { mutableStateOf(service?.description ?: "") }
     var price by remember { mutableStateOf(service?.price ?: "") }
-    var category by remember { mutableStateOf(service?.category ?: "") }
+ //   var category by remember { mutableStateOf(service?.category ?: "") }
     var selectedImage by remember { mutableStateOf(service?.imageRes ?: R.drawable.cleaning) }
     var availabilities by remember { mutableStateOf(service?.availabilities ?: emptyList()) }
 
@@ -402,13 +402,13 @@ private fun AddEditServiceDialog(
                     label = { Text("Price") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = { category = it },
-                    label = { Text("Category") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+//                Spacer(modifier = Modifier.height(8.dp))
+//                OutlinedTextField(
+//                    value = category,
+//                    onValueChange = { category = it },
+//                    label = { Text("Category") },
+//                    modifier = Modifier.fillMaxWidth()
+//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -480,7 +480,7 @@ private fun AddEditServiceDialog(
                         title = title,
                         description = description,
                         price = price,
-                        category = category,
+                     //   category = category,
                         imageRes = selectedImage,
                         availabilities = availabilities
                     )
@@ -566,15 +566,15 @@ fun ServiceCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = service.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = PrimaryYellowDark,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(PrimaryYellowLight.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+//                    Text(
+//                        text = service.category,
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = PrimaryYellowDark,
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(4.dp))
+//                            .background(PrimaryYellowLight.copy(alpha = 0.2f))
+//                            .padding(horizontal = 8.dp, vertical = 4.dp)
+//                    )
                 }
             }
 

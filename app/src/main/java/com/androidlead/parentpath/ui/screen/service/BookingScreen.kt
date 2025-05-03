@@ -29,7 +29,7 @@ import com.androidlead.parentpath.R
 import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.delay
 // Enum for booking status
 enum class BookingStatus {
     WAITING_APPROVAL,
@@ -67,6 +67,7 @@ fun BookingScreen(
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var bookingToDelete by remember { mutableStateOf<Booking?>(null) }
+    var paymentInProgress by remember { mutableStateOf<Int?>(null) }
 
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
@@ -96,7 +97,7 @@ fun BookingScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Emna",
+                        text = "Hello sarra",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -234,10 +235,13 @@ fun BookingScreen(
                                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paypalUrl))
                                                 context.startActivity(intent)
 
-                                                // Update status to paid after payment
-                                                val index = bookings.indexOf(booking)
-                                                if (index != -1) {
-                                                    bookings[index] = booking.copy(status = BookingStatus.PAID)
+                                                // Launch a coroutine to update status after 5 seconds
+                                                scope.launch {
+                                                    delay(5000L) // 5 second delay
+                                                    val index = bookings.indexOf(booking)
+                                                    if (index != -1) {
+                                                        bookings[index] = booking.copy(status = BookingStatus.PAID)
+                                                    }
                                                 }
                                             },
                                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
