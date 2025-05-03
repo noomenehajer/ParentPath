@@ -297,30 +297,46 @@ fun BookingScreen(
                                                 context.startActivity(intent)
 
                                                 // Launch a coroutine to update status after 5 seconds
+
+                                                // Launch a coroutine to update status after 5 seconds
                                                 scope.launch {
-                                                    paymentInProgress = booking.id
                                                     delay(5000L) // 5 second delay
                                                     val index = bookings.indexOf(booking)
                                                     if (index != -1) {
                                                         bookings[index] = booking.copy(status = BookingStatus.PAID)
                                                     }
-                                                    paymentInProgress = null
                                                 }
                                             },
-                                            enabled = paymentInProgress != booking.id,
                                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
                                         ) {
-                                            if (paymentInProgress == booking.id) {
-                                                CircularProgressIndicator(
-                                                    color = Color.White,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                            } else {
-                                                Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text("Pay Now")
-                                            }
+                                            Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text("Pay Now")
                                         }
+//                                                scope.launch {
+//                                                    paymentInProgress = booking.id
+//                                                    delay(5000L) // 5 second delay
+//                                                    val index = bookings.indexOf(booking)
+//                                                    if (index != -1) {
+//                                                        bookings[index] = booking.copy(status = BookingStatus.PAID)
+//                                                    }
+//                                                    paymentInProgress = null
+//                                                }
+//                                            },
+//                                            enabled = paymentInProgress != booking.id,
+//                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+//                                        ) {
+//                                            if (paymentInProgress == booking.id) {
+//                                                CircularProgressIndicator(
+//                                                    color = Color.White,
+//                                                    modifier = Modifier.size(20.dp)
+//                                                )
+//                                            } else {
+//                                                Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+//                                                Spacer(modifier = Modifier.width(8.dp))
+//                                                Text("Pay Now")
+//                                            }
+//                                        }
 
                                         Button(
                                             onClick = {
