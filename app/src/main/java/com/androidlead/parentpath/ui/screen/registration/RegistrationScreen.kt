@@ -88,7 +88,7 @@ fun RegistrationScreen(
                 value = fullName,
                 onValueChange = { fullName = it },
                 leadingIconRes = R.drawable.ic_user,
-                placeholderText = "Full Name"
+                placeholderText = "User Name"
             )
 
             InputField(
