@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,7 +48,8 @@ data class Service(
     val name: String,
     val provider: String,
     val description: String,
-    val imageResId: Int
+    val imageResId: Int,
+    val rating: Float = 0f // Added rating property
 )
 
 data class Article(
@@ -55,6 +57,39 @@ data class Article(
     val description: String,
     val imageResId: Int
 )
+
+@Composable
+fun StarRating(
+    rating: Float,
+    modifier: Modifier = Modifier,
+    stars: Int = 5,
+    starSize: Int = 16
+) {
+    Row(modifier = modifier) {
+        for (i in 1..stars) {
+            val starIcon = if (i <= rating) {
+                Icons.Outlined.Star
+            } else if (i - 0.5 <= rating) {
+                Icons.Outlined.Star
+            } else {
+                Icons.Outlined.Star
+            }
+
+            Icon(
+                imageVector = starIcon,
+                contentDescription = "Star $i",
+                tint = if (i <= rating) PrimaryPink else Color.LightGray,
+                modifier = Modifier.size(starSize.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = "%.1f".format(rating),
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,11 +106,11 @@ fun HomeScreen(
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
     val services = listOf(
-        Service("Math Tutoring", "Sarra M.", "Expert in algebra and geometry", R.drawable.tutor),
-        Service("Delivery", "Amir R.", "Comfortable transport for school or errands", R.drawable.delivery),
-        Service("babysitting", "Sarra M.", "Experienced babysitter available anytime", R.drawable.babysitter),
-        Service("Home Cleaning", "Ali K.", "Fast, reliable and spotless service", R.drawable.cleaning),
-        Service("Fitness Coach", "Sarra M.", "Personalized health programs", R.drawable.fitness)
+        Service("Home Cleaning", "Ali K.", "Fast, reliable and spotless service", R.drawable.cleaning, 5f),
+        Service("Math Tutoring", "Sarra M.", "Expert in algebra and geometry", R.drawable.tutor, 4.8f),
+        Service("Delivery", "Amir R.", "Comfortable transport for school or errands", R.drawable.delivery, 4f),
+        Service("Babysitting", "Sarra M.", "Experienced babysitter available anytime", R.drawable.babysitter, 3.5f),
+        Service("Fitness Coach", "Sarra M.", "Personalized health programs", R.drawable.fitness, 2f)
     )
 
     val articles = listOf(
@@ -408,6 +443,10 @@ fun HomeScreen(
                                         text = "by ${service.provider}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Color.Gray
+                                    )
+                                    StarRating(
+                                        rating = service.rating,
+                                        modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                     Text(
                                         text = service.description,

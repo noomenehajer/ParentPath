@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import com.androidlead.parentpath.ui.screen.container.NavGraph
 import com.androidlead.parentpath.ui.theme.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+
 // Enum for booking status
 enum class BookingStatus {
     WAITING_APPROVAL,
@@ -42,8 +44,36 @@ data class Booking(
     val serviceName: String,
     val serviceDate: String,
     val price: String,
-    val status: BookingStatus = BookingStatus.WAITING_APPROVAL // Changed to status enum
+    val status: BookingStatus = BookingStatus.WAITING_APPROVAL,
+    val userRating: Float? = null // Added rating property
 )
+
+@Composable
+fun RatingBar(
+    currentRating: Float?,
+    onRatingChanged: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    stars: Int = 5
+) {
+    Row(modifier = modifier) {
+        for (i in 1..stars) {
+            val starIcon = if (currentRating != null && i <= currentRating) {
+                Icons.Outlined.Star
+            } else {
+                Icons.Outlined.Star
+            }
+
+            Icon(
+                imageVector = starIcon,
+                contentDescription = "Star $i",
+                tint = if (currentRating != null && i <= currentRating) PrimaryPink else Color.LightGray,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable { onRatingChanged(i.toFloat()) }
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,15 +89,18 @@ fun BookingScreen(
     val bookings = remember {
         mutableStateListOf(
             Booking(1, "Babysitting", "2025-05-05", "30", BookingStatus.PAID),
-            Booking(2, "Private Tutoring", "2025-05-10", "50", BookingStatus.WAITING_APPROVAL),
+            Booking(2, "Cooking Assistance", "2025-05-15", "40", BookingStatus.PAID),
             Booking(3, "Private Tutoring", "2025-05-12", "45", BookingStatus.APPROVED),
-            Booking(4, "Cooking Assistance", "2025-05-15", "40", BookingStatus.PAID)
+            Booking(4, "Home Cleaning", "2025-05-10", "50", BookingStatus.WAITING_APPROVAL)
         )
     }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var bookingToDelete by remember { mutableStateOf<Booking?>(null) }
     var paymentInProgress by remember { mutableStateOf<Int?>(null) }
+    var showRatingDialog by remember { mutableStateOf(false) }
+    var bookingToRate by remember { mutableStateOf<Booking?>(null) }
+    var currentRating by remember { mutableStateOf(0f) }
 
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
@@ -204,6 +237,34 @@ fun BookingScreen(
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 8.dp)
                                     )
+
+                                    // Show rating if exists or rate button
+                                    if (booking.userRating != null) {
+                                        Text(
+                                            text = "Your rating:",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+                                        RatingBar(
+                                            currentRating = booking.userRating,
+                                            onRatingChanged = {},
+                                            modifier = Modifier.padding(vertical = 4.dp)
+                                        )
+                                    } else {
+                                        Button(
+                                            onClick = {
+                                                bookingToRate = booking
+                                                currentRating = 0f
+                                                showRatingDialog = true
+                                            },
+                                            modifier = Modifier.padding(top = 8.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = PrimaryPink
+                                            )
+                                        ) {
+                                            Text("Rate this service")
+                                        }
+                                    }
                                 }
                             }
 
@@ -237,18 +298,28 @@ fun BookingScreen(
 
                                                 // Launch a coroutine to update status after 5 seconds
                                                 scope.launch {
+                                                    paymentInProgress = booking.id
                                                     delay(5000L) // 5 second delay
                                                     val index = bookings.indexOf(booking)
                                                     if (index != -1) {
                                                         bookings[index] = booking.copy(status = BookingStatus.PAID)
                                                     }
+                                                    paymentInProgress = null
                                                 }
                                             },
+                                            enabled = paymentInProgress != booking.id,
                                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
                                         ) {
-                                            Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text("Pay Now")
+                                            if (paymentInProgress == booking.id) {
+                                                CircularProgressIndicator(
+                                                    color = Color.White,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            } else {
+                                                Icon(Icons.Default.ShoppingCart, contentDescription = "Pay")
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text("Pay Now")
+                                            }
                                         }
 
                                         Button(
@@ -292,6 +363,48 @@ fun BookingScreen(
                             bookingToDelete = null
                         }) {
                             Text("No")
+                        }
+                    }
+                )
+            }
+
+            if (showRatingDialog && bookingToRate != null) {
+                AlertDialog(
+                    onDismissRequest = { showRatingDialog = false },
+                    title = { Text("Rate ${bookingToRate?.serviceName}") },
+                    text = {
+                        Column {
+                            Text("How would you rate this service?")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            RatingBar(
+                                currentRating = if (currentRating > 0) currentRating else null,
+                                onRatingChanged = { currentRating = it },
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                val index = bookings.indexOf(bookingToRate)
+                                if (index != -1 && currentRating > 0) {
+                                    bookings[index] = bookingToRate!!.copy(userRating = currentRating)
+                                }
+                                showRatingDialog = false
+                                bookingToRate = null
+                            },
+                            enabled = currentRating > 0,
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
+                        ) {
+                            Text("Submit Rating")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showRatingDialog = false
+                            bookingToRate = null
+                        }) {
+                            Text("Cancel")
                         }
                     }
                 )

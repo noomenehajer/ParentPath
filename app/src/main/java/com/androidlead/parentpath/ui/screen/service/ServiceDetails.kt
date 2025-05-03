@@ -146,7 +146,7 @@ fun ServiceDetails(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = "By: Maya K",
+                    text = "By: Ali K.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.DarkGray
                 )
