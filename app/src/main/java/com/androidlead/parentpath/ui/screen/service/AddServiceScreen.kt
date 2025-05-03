@@ -248,7 +248,7 @@ private fun AddEditServiceDialog(
     var description by remember { mutableStateOf(service?.description ?: "") }
     var price by remember { mutableStateOf(service?.price ?: "") }
  //   var category by remember { mutableStateOf(service?.category ?: "") }
-    var selectedImage by remember { mutableStateOf(service?.imageRes ?: R.drawable.cleaning) }
+    var selectedImage by remember { mutableStateOf(service?.imageRes ?: R.drawable.im) }
     var availabilities by remember { mutableStateOf(service?.availabilities ?: emptyList()) }
 
     // Date and Time Picker states
