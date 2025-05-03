@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.androidlead.parentpath.R
@@ -65,13 +66,16 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
+    var showNotifications by remember { mutableStateOf(false) }
+    var showConfirmation by remember { mutableStateOf(true) }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
 
     val services = listOf(
-        Service("Math Tutoring", "Sarah M.", "Expert in algebra and geometry", R.drawable.tutor),
-        Service("Child Care", "Lina A.", "Experienced babysitter available anytime", R.drawable.babysitter),
-        Service("Fitness Coach", "Hassan B.", "Personalized health programs", R.drawable.fitness),
-        Service("Home Cleaning", "Maya K.", "Fast, reliable and spotless service", R.drawable.cleaning),
-        Service("Delivery", "Ali R.", "Comfortable transport for school or errands", R.drawable.delivery)
+        Service("Math Tutoring", "Sarra M.", "Expert in algebra and geometry", R.drawable.tutor),
+        Service("Delivery", "Amir R.", "Comfortable transport for school or errands", R.drawable.delivery),
+        Service("babysitting", "Sarra M.", "Experienced babysitter available anytime", R.drawable.babysitter),
+        Service("Home Cleaning", "Ali K.", "Fast, reliable and spotless service", R.drawable.cleaning),
+        Service("Fitness Coach", "Sarra M.", "Personalized health programs", R.drawable.fitness)
     )
 
     val articles = listOf(
@@ -158,14 +162,68 @@ fun HomeScreen(
                                 tint = Color.DarkGray
                             )
                         }
-                                        },
+                    },
                     actions = {
-                        IconButton(onClick = { }) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = Color.DarkGray
-                            )
+                        Box {
+                            IconButton(onClick = { showNotifications = !showNotifications }) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = Color.DarkGray
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = showNotifications,
+                                onDismissRequest = { showNotifications = false },
+                                modifier = Modifier
+                                    .width(280.dp)
+                                    .padding(8.dp)
+                            ) {
+                                if (showConfirmation) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Column {
+                                                Text(
+                                                    text = "Mohamed is waiting for your approval",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                                Text(
+                                                    text = "Babysitting service",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = Color.Gray
+                                                )
+                                            }
+                                        },
+                                        trailingIcon = {
+                                            IconButton(
+                                                onClick = {
+                                                    showConfirmationDialog = true
+                                                    showNotifications = false
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Check,
+                                                    contentDescription = "Confirm",
+                                                    tint = PrimaryPink
+                                                )
+                                            }
+                                        },
+                                        onClick = {}
+                                    )
+                                } else {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "No new notifications",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        },
+                                        onClick = { showNotifications = false }
+                                    )
+                                }
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -175,6 +233,45 @@ fun HomeScreen(
                 )
             }
         ) { paddingValues ->
+            if (showConfirmationDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showConfirmationDialog = false
+                        showNotifications = true
+                    },
+                    title = {
+                        Text("Confirm Approval")
+                    },
+                    text = {
+                        Text("Are you sure you want to approve Mohamed's babysitting service request?")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showConfirmation = false
+                                showConfirmationDialog = false
+                                // Add your approval logic here
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryPink
+                            )
+                        ) {
+                            Text("Approve")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showConfirmationDialog = false
+                                showNotifications = true
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
             LazyColumn(
                 modifier = modifier
                     .fillMaxSize()
@@ -189,7 +286,6 @@ fun HomeScreen(
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
-                    // Search Bar
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -219,8 +315,7 @@ fun HomeScreen(
                         keyboardActions = KeyboardActions(onSearch = { })
                     )
 
-                    // Categories
-                    val categories = listOf("Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
+                    val categories = listOf("Math Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -247,7 +342,6 @@ fun HomeScreen(
                     }
                 }
 
-                // Services Section
                 item {
                     Text(
                         text = "Services",
@@ -278,70 +372,69 @@ fun HomeScreen(
                     }
                 } else {
                     items(filteredServices) { service ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .shadow(4.dp, RoundedCornerShape(16.dp)),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Row(
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .shadow(4.dp, RoundedCornerShape(16.dp)),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
                         ) {
-                            Image(
-                                painter = painterResource(id = service.imageResId),
-                                contentDescription = service.name,
-                                contentScale = ContentScale.Crop,
+                            Row(
                                 modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column(
-                                modifier = Modifier.weight(1f)
+                                    .fillMaxWidth()
+                                    .padding(12.dp)
                             ) {
-                                Text(
-                                    text = service.name,
-                                    style = MaterialTheme.typography.titleSmall.copy(
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    color = Color.Black
+                                Image(
+                                    painter = painterResource(id = service.imageResId),
+                                    contentDescription = service.name,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(RoundedCornerShape(12.dp))
                                 )
-                                Text(
-                                    text = "by ${service.provider}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = service.description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.DarkGray,
-                                    maxLines = 2,
-                                    modifier = Modifier.padding(vertical = 4.dp)
-                                )
-                                Button(
-                                    onClick = { navHost.navigate(NavGraph.Details.route) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryPink
-                                    )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(
+                                    modifier = Modifier.weight(1f)
                                 ) {
                                     Text(
-                                        text = "View Details",
-                                        color = Color.White
+                                        text = service.name,
+                                        style = MaterialTheme.typography.titleSmall.copy(
+                                            fontWeight = FontWeight.Bold
+                                        ),
+                                        color = Color.Black
                                     )
+                                    Text(
+                                        text = "by ${service.provider}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Gray
+                                    )
+                                    Text(
+                                        text = service.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.DarkGray,
+                                        maxLines = 2,
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
+                                    Button(
+                                        onClick = { navHost.navigate(NavGraph.Details.route) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = PrimaryPink
+                                        )
+                                    ) {
+                                        Text(
+                                            text = "View Details",
+                                            color = Color.White
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-            }
-                // Articles Section
                 item {
                     Text(
                         text = "Articles",
