@@ -163,7 +163,7 @@ fun ServiceDetails(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Price: 20DT/Hour", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+            Text("Price: 50DT/Hour", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
 
             Spacer(modifier = Modifier.height(16.dp))
 

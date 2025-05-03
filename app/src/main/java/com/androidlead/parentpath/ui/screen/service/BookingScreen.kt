@@ -88,10 +88,10 @@ fun BookingScreen(
 
     val bookings = remember {
         mutableStateListOf(
-            Booking(1, "Babysitting", "2025-05-05", "30", BookingStatus.PAID),
+            Booking(1, "Babysitting", "2025-15-05", "30", BookingStatus.PAID),
             Booking(2, "Cooking Assistance", "2025-05-15", "40", BookingStatus.PAID),
             Booking(3, "Private Tutoring", "2025-05-12", "45", BookingStatus.APPROVED),
-            Booking(4, "Home Cleaning", "2025-05-10", "50", BookingStatus.WAITING_APPROVAL)
+            Booking(4, "Home Cleaning", "2025-05-05", "50", BookingStatus.WAITING_APPROVAL)
         )
     }
 
