@@ -52,7 +52,6 @@ data class Service(
     val title: String,
     val description: String,
     val price: String,
-   // val category: String,
     val imageRes: Int,
     val availabilities: List<Availability> = emptyList()
 )
@@ -69,13 +68,15 @@ fun AddServiceScreen(
     var showAddServiceDialog by remember { mutableStateOf(false) }
     var showEditServiceDialog by remember { mutableStateOf(false) }
     var editingService by remember { mutableStateOf<Service?>(null) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var serviceToDelete by remember { mutableStateOf<Service?>(null) }
 
-    // Sample services data - moved inside the composable
+    // Sample services data
     val services = remember {
         mutableStateListOf(
-            Service("1", "Babysitting", "Childcare services", "15TND/hr",  R.drawable.babysitter),
-            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr",  R.drawable.tutor),
-            Service("3", "Fitness Coach", "Fitness health care", "12TND/hr",  R.drawable.fitness)
+            Service("1", "Babysitting", "Childcare services", "15TND/hr", R.drawable.babysitter),
+            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", R.drawable.tutor),
+            Service("3", "Fitness Coach", "Fitness health care", "12TND/hr", R.drawable.fitness)
         )
     }
 
@@ -202,7 +203,8 @@ fun AddServiceScreen(
                             showEditServiceDialog = true
                         },
                         onDeleteClick = {
-                            services.remove(service)
+                            serviceToDelete = service
+                            showDeleteConfirmation = true
                         }
                     )
                 }
@@ -234,6 +236,37 @@ fun AddServiceScreen(
                     }
                 )
             }
+
+            // Delete Confirmation Dialog
+            if (showDeleteConfirmation && serviceToDelete != null) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirmation = false },
+                    title = { Text("Confirm Deletion") },
+                    text = { Text("Are you sure you want to delete '${serviceToDelete?.title}'? This action cannot be undone.") },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                services.remove(serviceToDelete)
+                                showDeleteConfirmation = false
+                                serviceToDelete = null
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        ) {
+                            Text("Delete")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showDeleteConfirmation = false
+                                serviceToDelete = null
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -247,7 +280,6 @@ private fun AddEditServiceDialog(
     var title by remember { mutableStateOf(service?.title ?: "") }
     var description by remember { mutableStateOf(service?.description ?: "") }
     var price by remember { mutableStateOf(service?.price ?: "") }
- //   var category by remember { mutableStateOf(service?.category ?: "") }
     var selectedImage by remember { mutableStateOf(service?.imageRes ?: R.drawable.im) }
     var availabilities by remember { mutableStateOf(service?.availabilities ?: emptyList()) }
 
@@ -402,13 +434,6 @@ private fun AddEditServiceDialog(
                     label = { Text("Price") },
                     modifier = Modifier.fillMaxWidth()
                 )
-//                Spacer(modifier = Modifier.height(8.dp))
-//                OutlinedTextField(
-//                    value = category,
-//                    onValueChange = { category = it },
-//                    label = { Text("Category") },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -476,11 +501,10 @@ private fun AddEditServiceDialog(
             Button(
                 onClick = {
                     val newService = Service(
-                        id = "0",
+                        id = service?.id ?: UUID.randomUUID().toString(),
                         title = title,
                         description = description,
                         price = price,
-                     //   category = category,
                         imageRes = selectedImage,
                         availabilities = availabilities
                     )
@@ -565,16 +589,6 @@ fun ServiceCard(
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
-
-//                    Text(
-//                        text = service.category,
-//                        style = MaterialTheme.typography.labelSmall,
-//                        color = PrimaryYellowDark,
-//                        modifier = Modifier
-//                            .clip(RoundedCornerShape(4.dp))
-//                            .background(PrimaryYellowLight.copy(alpha = 0.2f))
-//                            .padding(horizontal = 8.dp, vertical = 4.dp)
-//                    )
                 }
             }
 
