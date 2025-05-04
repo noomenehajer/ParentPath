@@ -49,13 +49,19 @@ data class Service(
     val provider: String,
     val description: String,
     val imageResId: Int,
-    val rating: Float = 0f // Added rating property
+    val rating: Float = 0f
 )
 
 data class Article(
     val title: String,
     val description: String,
     val imageResId: Int
+)
+
+data class ChatMessage(
+    val text: String,
+    val isUser: Boolean,
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 @Composable
@@ -91,6 +97,154 @@ fun StarRating(
     }
 }
 
+@Composable
+fun ChatBotDialog(
+    onDismiss: () -> Unit,
+    messages: List<ChatMessage>,
+    onSendMessage: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var userInput by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .heightIn(min = 300.dp, max = 500.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
+                // Header with smaller bot icon
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(PrimaryPink)
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.bot),
+                        contentDescription = "AI Assistant",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Parenting Assistant",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                // Messages
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    reverseLayout = true
+                ) {
+                    items(messages.reversed()) { message ->
+                        MessageBubble(message = message)
+                    }
+                }
+
+                // Input
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = userInput,
+                        onValueChange = { userInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Ask about parenting...") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,  // Darker text color
+                            unfocusedTextColor = Color.Black,  // Darker text color
+                            cursorColor = Color.Black,  // Darker cursor color
+                            focusedBorderColor = PrimaryPink,
+                            unfocusedBorderColor = Color.LightGray
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                        keyboardActions = KeyboardActions(
+                            onSend = {
+                                if (userInput.isNotBlank()) {
+                                    onSendMessage(userInput)
+                                    userInput = ""
+                                }
+                            }
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = {
+                            if (userInput.isNotBlank()) {
+                                onSendMessage(userInput)
+                                userInput = ""
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Send,
+                            contentDescription = "Send",
+                            tint = PrimaryPink
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MessageBubble(message: ChatMessage) {
+    val alignment = if (message.isUser) Alignment.End else Alignment.Start
+    val bubbleColor = if (message.isUser) PrimaryPink else Color.LightGray
+    val textColor = if (message.isUser) Color.White else Color.Black
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalAlignment = alignment
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = if (message.isUser) 16.dp else 0.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 16.dp,
+                        bottomEnd = if (message.isUser) 0.dp else 16.dp
+                    )
+                )
+                .background(bubbleColor)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = message.text,
+                color = textColor,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -104,6 +258,10 @@ fun HomeScreen(
     var showNotifications by remember { mutableStateOf(false) }
     var showConfirmation by remember { mutableStateOf(true) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showChatBot by remember { mutableStateOf(false) }
+    val chatMessages = remember { mutableStateListOf<ChatMessage>(
+        ChatMessage("Hello! I'm your parenting assistant. How can I help you today?", false)
+    )}
 
     val services = listOf(
         Service("Home Cleaning", "Ali K.", "Fast, reliable and spotless service", R.drawable.cleaning, 5f),
@@ -125,6 +283,65 @@ fun HomeScreen(
         MenuItem("Offer a Service", Icons.Default.Add) { navHost.navigate(NavGraph.Service.route) },
         MenuItem("Booking List", Icons.Default.List) { navHost.navigate(NavGraph.Booking.route) }
     )
+
+    fun sendMessage(message: String) {
+        chatMessages.add(ChatMessage(message, true))
+
+        // Generate a thoughtful parenting response based on the user's question
+        val response = when {
+            message.contains("hello", ignoreCase = true) -> {
+                "Hello there! 👋 I'm your parenting assistant. How can I help you today?"
+            }
+            message.contains("thank you", ignoreCase = true) || message.contains("thanks", ignoreCase = true) -> {
+                "You're very welcome! 😊 Remember, parenting is a journey and you're doing great. " +
+                        "Is there anything else I can help you with?"
+            }
+            message.contains("sleep", ignoreCase = true) -> {
+                "For better sleep routines, establish a consistent bedtime schedule. " +
+                        "For infants, try soothing activities before bed. " +
+                        "Toddlers benefit from a predictable routine (bath, story, bed)."
+            }
+            message.contains("tantrum", ignoreCase = true) -> {
+                "When handling tantrums:\n1. Stay calm\n2. Acknowledge their feelings\n" +
+                        "3. Offer comfort\n4. Don't give in to unreasonable demands\n" +
+                        "5. Teach better ways to express emotions as they calm down."
+            }
+            message.contains("discipline", ignoreCase = true) -> {
+                "Effective discipline strategies:\n- Set clear expectations\n" +
+                        "- Use positive reinforcement\n- Be consistent with consequences\n" +
+                        "- Model good behavior\n- Redirect negative behavior when possible."
+            }
+            message.contains("nutrition", ignoreCase = true) || message.contains("eat", ignoreCase = true) -> {
+                "Nutrition tips for kids:\n- Offer variety of fruits/vegetables\n" +
+                        "- Limit processed foods\n- Make mealtimes pleasant\n" +
+                        "- Involve kids in meal prep\n- Don't force eating - offer healthy options and let them choose."
+            }
+            message.contains("screen time", ignoreCase = true) -> {
+                "Screen time recommendations:\n- Under 2: Avoid except video chatting\n" +
+                        "- 2-5: 1 hour/day of high-quality programs\n- 6+: Consistent limits\n" +
+                        "Tips: Co-view when possible, avoid screens before bedtime, create tech-free zones."
+            }
+            message.contains("activity", ignoreCase = true) || message.contains("play", ignoreCase = true) -> {
+                "Great developmental activities:\n- For toddlers: Sensory play, blocks, simple puzzles\n" +
+                        "- Preschoolers: Pretend play, arts/crafts, outdoor play\n" +
+                        "- School-age: Sports, board games, reading together\n" +
+                        "Unstructured play is crucial for development!"
+            }
+            else -> {
+                // General parenting advice for unrecognized questions
+                "Parenting can be challenging but rewarding. Some general tips:\n" +
+                        "- Be patient and consistent\n- Show unconditional love\n" +
+                        "- Listen actively to your child\n- Set reasonable boundaries\n" +
+                        "- Take care of yourself too - you can't pour from an empty cup!\n\n" +
+                        "Would you like more specific advice about sleep, nutrition, discipline, or another topic?"
+            }
+        }
+
+        scope.launch {
+            kotlinx.coroutines.delay(1000) // Simulate thinking time
+            chatMessages.add(ChatMessage(response, false))
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -179,396 +396,425 @@ fun HomeScreen(
             }
         }
     ) {
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "♡ Here For You ♡",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = Color.DarkGray
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                tint = Color.DarkGray
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Text(
+                                text = "♡ Here For You ♡",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = Color.DarkGray
                             )
-                        }
-                    },
-                    actions = {
-                        Box {
-                            IconButton(onClick = { showNotifications = !showNotifications }) {
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Notifications",
+                                    Icons.Default.Menu,
+                                    contentDescription = "Menu",
                                     tint = Color.DarkGray
                                 )
                             }
-
-                            DropdownMenu(
-                                expanded = showNotifications,
-                                onDismissRequest = { showNotifications = false },
-                                modifier = Modifier
-                                    .width(280.dp)
-                                    .padding(8.dp)
-                            ) {
-                                if (showConfirmation) {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Column {
-                                                Text(
-                                                    text = "Mohamed is waiting for your approval",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = FontWeight.SemiBold
-                                                )
-                                                Text(
-                                                    text = "Babysitting service",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = Color.Gray
-                                                )
-                                            }
-                                        },
-                                        trailingIcon = {
-                                            IconButton(
-                                                onClick = {
-                                                    showConfirmationDialog = true
-                                                    showNotifications = false
-                                                }
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = "Confirm",
-                                                    tint = PrimaryPink
-                                                )
-                                            }
-                                        },
-                                        onClick = {}
-                                    )
-                                } else {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = "No new notifications",
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        },
-                                        onClick = { showNotifications = false }
+                        },
+                        actions = {
+                            Box {
+                                IconButton(onClick = { showNotifications = !showNotifications }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = "Notifications",
+                                        tint = Color.DarkGray
                                     )
                                 }
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        actionIconContentColor = Color.DarkGray
-                    )
-                )
-            }
-        ) { paddingValues ->
-            if (showConfirmationDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showConfirmationDialog = false
-                        showNotifications = true
-                    },
-                    title = {
-                        Text("Confirm Approval")
-                    },
-                    text = {
-                        Text("Are you sure you want to approve Mohamed's babysitting service request?")
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showConfirmation = false
-                                showConfirmationDialog = false
-                                // Add your approval logic here
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryPink
-                            )
-                        ) {
-                            Text("Approve")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                showConfirmationDialog = false
-                                showNotifications = true
-                            }
-                        ) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
 
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0f to PrimaryPinkBlended,
-                            0.6f to PrimaryYellowLight,
-                            1f to PrimaryYellow
+                                DropdownMenu(
+                                    expanded = showNotifications,
+                                    onDismissRequest = { showNotifications = false },
+                                    modifier = Modifier
+                                        .width(280.dp)
+                                        .padding(8.dp)
+                                ) {
+                                    if (showConfirmation) {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Column {
+                                                    Text(
+                                                        text = "Mohamed is waiting for your approval",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.SemiBold
+                                                    )
+                                                    Text(
+                                                        text = "Babysitting service",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = Color.Gray
+                                                    )
+                                                }
+                                            },
+                                            trailingIcon = {
+                                                IconButton(
+                                                    onClick = {
+                                                        showConfirmationDialog = true
+                                                        showNotifications = false
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Check,
+                                                        contentDescription = "Confirm",
+                                                        tint = PrimaryPink
+                                                    )
+                                                }
+                                            },
+                                            onClick = {}
+                                        )
+                                    } else {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = "No new notifications",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            },
+                                            onClick = { showNotifications = false }
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            actionIconContentColor = Color.DarkGray
                         )
                     )
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                item {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        placeholder = { Text("Search...", color = Color.DarkGray) },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = Color.DarkGray
-                            )
+                }
+            ) { paddingValues ->
+                if (showConfirmationDialog) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showConfirmationDialog = false
+                            showNotifications = true
                         },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            focusedBorderColor = Color.Gray,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.Black,
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
-                        ),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { })
-                    )
-
-                    val categories = listOf("Math Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(categories) { category ->
-                            ElevatedAssistChip(
-                                onClick = {},
-                                label = {
-                                    Text(
-                                        text = category,
-                                        color = Color.DarkGray,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
+                        title = {
+                            Text("Confirm Approval")
+                        },
+                        text = {
+                            Text("Are you sure you want to approve Mohamed's babysitting service request?")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showConfirmation = false
+                                    showConfirmationDialog = false
                                 },
-                                shape = RoundedCornerShape(20.dp),
-                                colors = AssistChipDefaults.elevatedAssistChipColors(
-                                    containerColor = Color.White
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = PrimaryPink
                                 )
+                            ) {
+                                Text("Approve")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = {
+                                    showConfirmationDialog = false
+                                    showNotifications = true
+                                }
+                            ) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
+
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                0f to PrimaryPinkBlended,
+                                0.6f to PrimaryYellowLight,
+                                1f to PrimaryYellow
                             )
+                        )
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    item {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            placeholder = { Text("Search...", color = Color.DarkGray) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Search",
+                                    tint = Color.DarkGray
+                                )
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
+                                focusedBorderColor = Color.Gray,
+                                unfocusedBorderColor = Color.LightGray,
+                                cursorColor = Color.Black,
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White
+                            ),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(onSearch = { })
+                        )
+
+                        val categories = listOf("Math Tutoring", "Babysitting", "Health", "Cleaning", "Transport")
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(categories) { category ->
+                                ElevatedAssistChip(
+                                    onClick = {},
+                                    label = {
+                                        Text(
+                                            text = category,
+                                            color = Color.DarkGray,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    },
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = AssistChipDefaults.elevatedAssistChipColors(
+                                        containerColor = Color.White
+                                    )
+                                )
+                            }
                         }
                     }
-                }
 
-                item {
-                    Text(
-                        text = "Services",
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.DarkGray
-                    )
-                }
-
-                val filteredServices = services.filter {
-                    it.name.contains(searchQuery, ignoreCase = true)
-                }
-
-                if (filteredServices.isEmpty()) {
                     item {
                         Text(
-                            text = "Oops! No services in your area yet.",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                textAlign = TextAlign.Center
-                            ),
-                            color = Color.DarkGray,
-                            textAlign = TextAlign.Center
+                            text = "Services",
+                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.DarkGray
                         )
                     }
-                } else {
-                    items(filteredServices) { service ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .shadow(4.dp, RoundedCornerShape(16.dp)),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                        ) {
-                            Row(
+
+                    val filteredServices = services.filter {
+                        it.name.contains(searchQuery, ignoreCase = true)
+                    }
+
+                    if (filteredServices.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Oops! No services in your area yet.",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(12.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = service.imageResId),
-                                    contentDescription = service.name,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = service.name,
-                                        style = MaterialTheme.typography.titleSmall.copy(
-                                            fontWeight = FontWeight.Bold
-                                        ),
-                                        color = Color.Black
-                                    )
-                                    Text(
-                                        text = "by ${service.provider}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Gray
-                                    )
-                                    StarRating(
-                                        rating = service.rating,
-                                        modifier = Modifier.padding(vertical = 2.dp)
-                                    )
-                                    Text(
-                                        text = service.description,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.DarkGray,
-                                        maxLines = 2,
-                                        modifier = Modifier.padding(vertical = 4.dp)
-                                    )
-                                    Button(
-                                        onClick = { navHost.navigate(NavGraph.Details.route) },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = PrimaryPink
-                                        )
-                                    ) {
-                                        Text(
-                                            text = "View Details",
-                                            color = Color.White
-                                        )
-                                    }
-                                }
-                            }
+                                    .padding(24.dp),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Center
+                                ),
+                                color = Color.DarkGray,
+                                textAlign = TextAlign.Center
+                            )
                         }
-                    }
-                }
-
-                item {
-                    Text(
-                        text = "Articles",
-                        modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 12.dp),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color.DarkGray
-                    )
-                }
-
-                item {
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        items(articles) { article ->
+                    } else {
+                        items(filteredServices) { service ->
                             Card(
                                 modifier = Modifier
-                                    .width(300.dp)
-                                    .height(240.dp)
-                                    .clickable { navHost.navigate(NavGraph.Article.route) },
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White
-                                ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .shadow(4.dp, RoundedCornerShape(16.dp)),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize()
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp)
                                 ) {
-                                    Box(
+                                    Image(
+                                        painter = painterResource(id = service.imageResId),
+                                        contentDescription = service.name,
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(150.dp)
-                                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                                    ) {
-                                        Image(
-                                            painter = painterResource(article.imageResId),
-                                            contentDescription = article.title,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxSize()
-                                        )
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .background(
-                                                    Brush.verticalGradient(
-                                                        colors = listOf(
-                                                            Color.Transparent,
-                                                            Color.Black.copy(alpha = 0.3f)
-                                                        ),
-                                                        startY = 100f
-                                                    )
-                                                )
-                                        )
-                                    }
-
+                                            .size(100.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
+                                        modifier = Modifier.weight(1f)
                                     ) {
                                         Text(
-                                            text = article.title,
-                                            style = MaterialTheme.typography.titleMedium.copy(
+                                            text = service.name,
+                                            style = MaterialTheme.typography.titleSmall.copy(
                                                 fontWeight = FontWeight.Bold
                                             ),
-                                            color = Color.Black,
-                                            maxLines = 1
+                                            color = Color.Black
                                         )
-                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
-                                            text = article.description,
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            text = "by ${service.provider}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.Gray
+                                        )
+                                        StarRating(
+                                            rating = service.rating,
+                                            modifier = Modifier.padding(vertical = 2.dp)
+                                        )
+                                        Text(
+                                            text = service.description,
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = Color.DarkGray,
-                                            maxLines = 2
+                                            maxLines = 2,
+                                            modifier = Modifier.padding(vertical = 4.dp)
                                         )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = "Read more →",
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            color = PrimaryPink
-                                        )
+                                        Button(
+                                            onClick = { navHost.navigate(NavGraph.Details.route) },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = PrimaryPink
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "View Details",
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Text(
+                            text = "Articles",
+                            modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 12.dp),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.DarkGray
+                        )
+                    }
+
+                    item {
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 24.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        ) {
+                            items(articles) { article ->
+                                Card(
+                                    modifier = Modifier
+                                        .width(300.dp)
+                                        .height(240.dp)
+                                        .clickable { navHost.navigate(NavGraph.Article.route) },
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(150.dp)
+                                                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                                        ) {
+                                            Image(
+                                                painter = painterResource(article.imageResId),
+                                                contentDescription = article.title,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier.fillMaxSize()
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .background(
+                                                        Brush.verticalGradient(
+                                                            colors = listOf(
+                                                                Color.Transparent,
+                                                                Color.Black.copy(alpha = 0.3f)
+                                                            ),
+                                                            startY = 100f
+                                                        )
+                                                    )
+                                            )
+                                        }
+
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp)
+                                        ) {
+                                            Text(
+                                                text = article.title,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    fontWeight = FontWeight.Bold
+                                                ),
+                                                color = Color.Black,
+                                                maxLines = 1
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = article.description,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color.DarkGray,
+                                                maxLines = 2
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = "Read more →",
+                                                style = MaterialTheme.typography.labelMedium.copy(
+                                                    fontWeight = FontWeight.SemiBold
+                                                ),
+                                                color = PrimaryPink
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            // Floating Chatbot Button with optimized size
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                FloatingActionButton(
+                    onClick = { showChatBot = true },
+                    containerColor = PrimaryPink,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.bot),
+                        contentDescription = "Chat with Parenting Assistant",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            if (showChatBot) {
+                ChatBotDialog(
+                    onDismiss = { showChatBot = false },
+                    messages = chatMessages,
+                    onSendMessage = { message -> sendMessage(message) }
+                )
             }
         }
     }
