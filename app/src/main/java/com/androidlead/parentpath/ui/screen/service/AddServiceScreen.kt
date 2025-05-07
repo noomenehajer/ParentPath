@@ -47,13 +47,22 @@ data class Availability(
     val endTime: String
 )
 
+data class ClientBooking(
+    val id: String,
+    val clientName: String,
+    val bookingDate: String,
+    val bookingTime: String,
+    val isCompleted: Boolean = false
+)
+
 data class Service(
     val id: String,
     val title: String,
     val description: String,
     val price: String,
     val imageRes: Int,
-    val availabilities: List<Availability> = emptyList()
+    val availabilities: List<Availability> = emptyList(),
+    val clientBookings: List<ClientBooking> = emptyList()
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,15 +79,40 @@ fun AddServiceScreen(
     var editingService by remember { mutableStateOf<Service?>(null) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var serviceToDelete by remember { mutableStateOf<Service?>(null) }
+    var showClientBookingsDialog by remember { mutableStateOf(false) }
+    var selectedServiceForBookings by remember { mutableStateOf<Service?>(null) }
 
-    // Sample services data
-    val services = remember {
-        mutableStateListOf(
-            Service("1", "Babysitting", "Childcare services", "15TND/hr", R.drawable.babysitter),
-            Service("2", "Tutoring", "Math and science tutoring", "20TND/hr", R.drawable.tutor),
-            Service("3", "Fitness Coach", "Fitness health care", "12TND/hr", R.drawable.fitness)
+    // Make services mutable and observable for immediate updates
+    val services = remember { mutableStateListOf(
+        Service(
+            "1",
+            "Babysitting",
+            "Childcare services",
+            "15TND/hr",
+            R.drawable.babysitter,
+            clientBookings = listOf(
+                ClientBooking("1", "Ahmed", "2023-06-15", "14:00"),
+                ClientBooking("2", "Eya", "2023-06-16", "10:00", true)
+            )
+        ),
+        Service(
+            "2",
+            "Tutoring",
+            "Math and science tutoring",
+            "20TND/hr",
+            R.drawable.tutor,
+            clientBookings = listOf(
+                ClientBooking("3", "Mohamed", "2023-06-17", "16:00")
+            )
+        ),
+        Service(
+            "3",
+            "Fitness Coach",
+            "Fitness health care",
+            "12TND/hr",
+            R.drawable.fitness
         )
-    }
+    )}
 
     val menuItems = listOf(
         MenuItem("Home", Icons.Default.Home) { navHost.navigate(NavGraph.Home.route) },
@@ -160,7 +194,6 @@ fun AddServiceScreen(
                 .padding(16.dp)
                 .systemBarsPadding()
         ) {
-            // Header with menu icon and title
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,7 +221,6 @@ fun AddServiceScreen(
                 }
             }
 
-            // Services List
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -205,12 +237,15 @@ fun AddServiceScreen(
                         onDeleteClick = {
                             serviceToDelete = service
                             showDeleteConfirmation = true
+                        },
+                        onViewBookingsClick = {
+                            selectedServiceForBookings = service
+                            showClientBookingsDialog = true
                         }
                     )
                 }
             }
 
-            // Add Service Dialog
             if (showAddServiceDialog) {
                 AddEditServiceDialog(
                     service = null,
@@ -222,7 +257,6 @@ fun AddServiceScreen(
                 )
             }
 
-            // Edit Service Dialog
             if (showEditServiceDialog && editingService != null) {
                 AddEditServiceDialog(
                     service = editingService,
@@ -237,7 +271,6 @@ fun AddServiceScreen(
                 )
             }
 
-            // Delete Confirmation Dialog
             if (showDeleteConfirmation && serviceToDelete != null) {
                 AlertDialog(
                     onDismissRequest = { showDeleteConfirmation = false },
@@ -263,6 +296,123 @@ fun AddServiceScreen(
                             }
                         ) {
                             Text("Cancel")
+                        }
+                    }
+                )
+            }
+
+            if (showClientBookingsDialog && selectedServiceForBookings != null) {
+                val service = selectedServiceForBookings!!
+                var currentService by remember { mutableStateOf(service) }
+
+                AlertDialog(
+                    onDismissRequest = { showClientBookingsDialog = false },
+                    title = {
+                        Text(
+                            text = "Bookings for ${currentService.title}",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    text = {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            if (currentService.clientBookings.isEmpty()) {
+                                Text(
+                                    text = "No bookings yet",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.heightIn(max = 400.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(currentService.clientBookings) { booking ->
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (booking.isCompleted) Color(0xFFE8F5E9) else Color(0xFFFFF8E1)
+                                            )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(12.dp)
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    Text(
+                                                        text = booking.clientName,
+                                                        style = MaterialTheme.typography.titleMedium.copy(
+                                                            color = Color.DarkGray,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    )
+                                                    if (booking.isCompleted) {
+                                                        Text(
+                                                            text = "Completed",
+                                                            color = Color(0xFF2E7D32),
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    } else {
+                                                        Text(
+                                                            text = "Pending",
+                                                            color = Color(0xFFFB8C00),
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                }
+
+                                                Spacer(modifier = Modifier.height(4.dp))
+
+                                                Text(
+                                                    text = "Date: ${booking.bookingDate} at ${booking.bookingTime}",
+                                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                                        color = Color.DarkGray
+                                                    )
+                                                )
+
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                                if (!booking.isCompleted) {
+                                                    Button(
+                                                        onClick = {
+                                                            // Update the booking status
+                                                            val updatedBookings = currentService.clientBookings.toMutableList()
+                                                            val bookingIndex = updatedBookings.indexOfFirst { it.id == booking.id }
+                                                            if (bookingIndex != -1) {
+                                                                updatedBookings[bookingIndex] = booking.copy(isCompleted = true)
+                                                                val updatedService = currentService.copy(clientBookings = updatedBookings)
+
+                                                                // Update the service in the main list
+                                                                val serviceIndex = services.indexOfFirst { it.id == currentService.id }
+                                                                if (serviceIndex != -1) {
+                                                                    services[serviceIndex] = updatedService
+                                                                }
+
+                                                                // Update the local state for immediate UI update
+                                                                currentService = updatedService
+                                                            }
+                                                        },
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            containerColor = PrimaryPink
+                                                        )
+                                                    ) {
+                                                        Text("Mark as Completed")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showClientBookingsDialog = false }
+                        ) {
+                            Text("Close")
                         }
                     }
                 )
@@ -297,12 +447,10 @@ private fun AddEditServiceDialog(
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            // In a real app, handle the image URI here
             selectedImage = R.drawable.babysitter
         }
     )
 
-    // Date Picker Dialog
     if (showDatePicker) {
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
@@ -321,7 +469,6 @@ private fun AddEditServiceDialog(
         datePickerDialog.show()
     }
 
-    // Start Time Picker Dialog
     if (showStartTimePicker) {
         val calendar = Calendar.getInstance()
         val timePickerDialog = TimePickerDialog(
@@ -337,12 +484,11 @@ private fun AddEditServiceDialog(
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
-            true // 24 hour format
+            true
         )
         timePickerDialog.show()
     }
 
-    // End Time Picker Dialog
     if (showEndTimePicker) {
         val calendar = Calendar.getInstance()
         val timePickerDialog = TimePickerDialog(
@@ -354,7 +500,6 @@ private fun AddEditServiceDialog(
                 selectedCal.set(Calendar.MINUTE, minute)
                 selectedEndTime = selectedCal
 
-                // Format the date and times
                 val dateStr = "${selectedDate?.get(Calendar.DAY_OF_MONTH)}/${selectedDate?.get(Calendar.MONTH)?.plus(1)}/${selectedDate?.get(Calendar.YEAR)}"
                 val startTimeStr = "${selectedStartTime?.get(Calendar.HOUR_OF_DAY)}:${selectedStartTime?.get(Calendar.MINUTE)?.toString()?.padStart(2, '0')}"
                 val endTimeStr = "${selectedEndTime?.get(Calendar.HOUR_OF_DAY)}:${selectedEndTime?.get(Calendar.MINUTE)?.toString()?.padStart(2, '0')}"
@@ -364,7 +509,7 @@ private fun AddEditServiceDialog(
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
-            true // 24 hour format
+            true
         )
         timePickerDialog.show()
     }
@@ -374,7 +519,6 @@ private fun AddEditServiceDialog(
         title = { Text(if (service == null) "Add New Service" else "Edit Service") },
         text = {
             Column {
-                // Image selection
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -437,7 +581,6 @@ private fun AddEditServiceDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Availability section
                 Text(
                     text = "Availability",
                     style = MaterialTheme.typography.titleSmall,
@@ -506,7 +649,8 @@ private fun AddEditServiceDialog(
                         description = description,
                         price = price,
                         imageRes = selectedImage,
-                        availabilities = availabilities
+                        availabilities = availabilities,
+                        clientBookings = service?.clientBookings ?: emptyList()
                     )
                     onConfirm(newService)
                 },
@@ -529,7 +673,8 @@ private fun AddEditServiceDialog(
 fun ServiceCard(
     service: Service,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onViewBookingsClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -545,7 +690,6 @@ fun ServiceCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Row {
-                // Image on the left
                 Image(
                     painter = painterResource(service.imageRes),
                     contentDescription = service.title,
@@ -557,7 +701,6 @@ fun ServiceCard(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Content on the right
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -592,7 +735,6 @@ fun ServiceCard(
                 }
             }
 
-            // Availability section
             if (service.availabilities.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -611,25 +753,68 @@ fun ServiceCard(
                 }
             }
 
+            if (service.clientBookings.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                val pendingCount = service.clientBookings.count { !it.isCompleted }
+                val completedCount = service.clientBookings.count { it.isCompleted }
+
+                Text(
+                    text = "Bookings:",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row {
+                    Text(
+                        text = "$completedCount completed",
+                        color = Color(0xFF2E7D32),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "$pendingCount pending",
+                        color = Color(0xFFFB8C00),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = onEditClick) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = PrimaryYellowDark
-                    )
+                if (service.clientBookings.isNotEmpty()) {
+                    Button(
+                        onClick = onViewBookingsClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryPink
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.List, contentDescription = "View Bookings")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("View Bookings")
+                    }
                 }
-                IconButton(onClick = onDeleteClick) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color(0xFFAA4B59)
-                    )
+
+                Row {
+                    IconButton(onClick = onEditClick) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = PrimaryYellowDark
+                        )
+                    }
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color(0xFFAA4B59)
+                        )
+                    }
                 }
             }
         }
