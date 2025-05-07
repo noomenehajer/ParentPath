@@ -280,6 +280,7 @@
         onRestartFlowClicked: () -> Unit,
         navHost: NavController
     ) {
+        var showApprovalConfirmation by remember { mutableStateOf(false) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var searchQuery by remember { mutableStateOf("") }
@@ -294,7 +295,7 @@
             BookingApprovalNotification(
                 id = "1",
                 serviceName = "Babysitting",
-                providerName = "Mohamed S.",
+                providerName = "Mohamed ",
                 bookingDate = "2023-06-15 at 14:00"
             )
         )}
@@ -303,7 +304,7 @@
             ServiceCompletionNotification(
                 id = "2",
                 serviceName = "Tutoring",
-                providerName = "Sarra M.",
+                providerName = "Sarra ",
                 bookingDate = "2023-06-16 at 10:00"
             )
         )}
@@ -316,11 +317,11 @@
         var showDisputeDialog by remember { mutableStateOf(false) }
 
         val services = listOf(
-            Service("Home Cleaning", "Ali K.", "Fast, reliable and spotless service", R.drawable.cleaning, 5f),
-            Service("Math Tutoring", "Sarra M.", "Expert in algebra and geometry", R.drawable.tutor, 4.8f),
-            Service("Delivery", "Amir R.", "Comfortable transport for school or errands", R.drawable.delivery, 4f),
-            Service("Babysitting", "Sarra M.", "Experienced babysitter available anytime", R.drawable.babysitter, 3.5f),
-            Service("Fitness Coach", "Sarra M.", "Personalized health programs", R.drawable.fitness, 2f)
+            Service("Home Cleaning", "Ali ", "Fast, reliable and spotless service", R.drawable.cleaning, 5f),
+            Service("Math Tutoring", "Sarra ", "Expert in algebra and geometry", R.drawable.tutor, 4.8f),
+            Service("Delivery", "Amir ", "Comfortable transport for school or errands", R.drawable.delivery, 4f),
+            Service("Babysitting", "Sarra ", "Experienced babysitter available anytime", R.drawable.babysitter, 3.5f),
+            Service("Fitness Coach", "Sarra ", "Personalized health programs", R.drawable.fitness, 2f)
         )
 
         val articles = listOf(
@@ -338,11 +339,18 @@
 
         // Handle booking approval
         fun approveBooking(notification: BookingApprovalNotification, isApproved: Boolean) {
-            val index = bookingApprovalNotifications.indexOfFirst { it.id == notification.id }
-            if (index != -1) {
-                bookingApprovalNotifications[index] = notification.copy(isApproved = isApproved)
+            if (isApproved) {
+                // Show confirmation dialog for approval
+                selectedBookingApproval = notification
+                showApprovalConfirmation = true
+            } else {
+                // Reject directly without confirmation
+                val index = bookingApprovalNotifications.indexOfFirst { it.id == notification.id }
+                if (index != -1) {
+                    bookingApprovalNotifications[index] = notification.copy(isApproved = false)
+                }
+                showBookingApprovalDialog = false
             }
-            showBookingApprovalDialog = false
         }
 
         // Handle service completion confirmation
@@ -571,7 +579,7 @@
                                                         text = {
                                                             Column {
                                                                 Text(
-                                                                    text = "Approve ${notification.providerName}'s booking",
+                                                                    text = "${notification.providerName} is awaiting your approval",
                                                                     style = MaterialTheme.typography.bodyMedium,
                                                                     fontWeight = FontWeight.SemiBold
                                                                 )
@@ -758,20 +766,55 @@
                         )
                     }
                 ) { paddingValues ->
-                    // Booking Approval Dialog
+                    // Add this with your other dialogs in the Scaffold content
+                    if (showApprovalConfirmation && selectedBookingApproval != null) {
+                        AlertDialog(
+                            onDismissRequest = { showApprovalConfirmation = false },
+                            title = { Text("Confirm Approval") },
+                            text = {
+                                Text(
+                                    text = "Are you sure you want to approve ${selectedBookingApproval?.providerName}'s ${selectedBookingApproval?.serviceName} request?",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        val index = bookingApprovalNotifications.indexOfFirst { it.id == selectedBookingApproval?.id }
+                                        if (index != -1) {
+                                            bookingApprovalNotifications[index] = selectedBookingApproval!!.copy(isApproved = true)
+                                        }
+                                        showApprovalConfirmation = false
+                                        showBookingApprovalDialog = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
+                                ) {
+                                    Text("Approve")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = { showApprovalConfirmation = false }
+                                ) {
+                                    Text("Cancel")
+                                }
+                            }
+                        )
+                    }
+                    // Replace your existing booking approval dialog with this
                     if (showBookingApprovalDialog && selectedBookingApproval != null) {
                         AlertDialog(
                             onDismissRequest = { showBookingApprovalDialog = false },
-                            title = { Text("Approve Booking Request") },
+                            title = { Text("Booking Request") },
                             text = {
                                 Column {
                                     Text(
-                                        text = "Do you want to approve this booking request?",
+                                        text = "${selectedBookingApproval?.providerName} requests to book:",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "${selectedBookingApproval?.serviceName} by ${selectedBookingApproval?.providerName}",
+                                        text = selectedBookingApproval?.serviceName ?: "",
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.DarkGray
@@ -788,9 +831,7 @@
                                     onClick = {
                                         selectedBookingApproval?.let { approveBooking(it, true) }
                                     },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryPink
-                                    )
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
                                 ) {
                                     Text("Approve")
                                 }
