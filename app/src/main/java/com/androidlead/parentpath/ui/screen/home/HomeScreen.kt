@@ -661,7 +661,7 @@
                                                                 style = MaterialTheme.typography.bodyMedium,
                                                                 fontWeight = FontWeight.SemiBold,
                                                                 color = when (notification.status) {
-                                                                    CompletionStatus.PENDING_CONFIRMATION -> Color.DarkGray
+                                                                    CompletionStatus.PENDING_CONFIRMATION -> Color.White
                                                                     CompletionStatus.CONFIRMED -> Color(0xFF2E7D32)
                                                                     CompletionStatus.DISPUTED -> Color(0xFFD32F2F)
                                                                     CompletionStatus.AUTO_CONFIRMED -> Color(0xFF1976D2)
