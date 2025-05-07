@@ -603,11 +603,11 @@
                                                                         approveBooking(notification, false)
                                                                     }
                                                                 ) {
-                                                                    Icon(
-                                                                        Icons.Default.Close,
-                                                                        contentDescription = "Reject",
-                                                                        tint = Color.Red
-                                                                    )
+//                                                                    Icon(
+//                                                                        Icons.Default.Close,
+//                                                                        contentDescription = "Reject",
+//                                                                        tint = Color.Red
+//                                                                    )
                                                                 }
                                                                 IconButton(
                                                                     onClick = {
