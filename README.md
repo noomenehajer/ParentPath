@@ -39,7 +39,7 @@
 - **After Booking**  
   ![Capture d'écran 2025-05-18 160844](https://github.com/user-attachments/assets/c2570e9c-c4fa-4233-85ba-2130d735fb8d)
 
-- ** Parenting resources & support**
+- **Parenting resources & support**
 ![Capture d'écran 2025-05-18 160939](https://github.com/user-attachments/assets/eebf022c-b8aa-4b81-b7cb-bc9693a9af5c)
 
 
