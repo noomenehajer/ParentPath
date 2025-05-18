@@ -30,8 +30,9 @@
 ![Capture d'écran 2025-05-18 160335](https://github.com/user-attachments/assets/e47bd494-fc48-4a9d-9d1d-fdb63e60f87d)
 
 ### Parent Features  
+
 - **Service Discovery**
-  ![Capture d'écran 2025-05-18 160550](https://github.com/user-attachments/assets/02d5b1ec-cad8-41c6-bf93-cb59276dbf4e)
+![Capture d'écran 2025-05-18 160550](https://github.com/user-attachments/assets/02d5b1ec-cad8-41c6-bf93-cb59276dbf4e)
 
 - **Booking Management**  
   ![Capture d'écran 2025-05-18 160741](https://github.com/user-attachments/assets/e8afaa1a-acb2-4e7c-a9df-88ce1eedda15)
