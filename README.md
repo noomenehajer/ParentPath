@@ -26,7 +26,7 @@
 ![log](https://github.com/user-attachments/assets/c3ba635d-c1ad-4f1d-9641-57cf13dd35c3)
 ![reg](https://github.com/user-attachments/assets/c60c53b5-66a5-4c18-b15c-00553f812e5a)
 
-##Profile modification 
+### Profile modification 
 ![Capture d'écran 2025-05-18 160335](https://github.com/user-attachments/assets/e47bd494-fc48-4a9d-9d1d-fdb63e60f87d)
 
 ### Parent Features  
